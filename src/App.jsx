@@ -27,13 +27,15 @@ import CSRDCompliance from './pages/CSRDCompliance'
 import AIAutomation from './pages/AIAutomation'
 import DataEntry from './pages/DataEntry'
 import Comparison from './pages/Comparison'
+import Cities from './pages/Cities'
 
 const navigation = [
   { name: 'Dashboard', href: '/', icon: LayoutDashboard },
+  { name: 'Belgian Cities', href: '/cities', icon: Building2 },
   { name: 'Sector Comparison', href: '/comparison', icon: TrendingUp },
   { name: 'Climate Action', href: '/climate', icon: Leaf },
   { name: 'Social Impact', href: '/social', icon: Users },
-  { name: 'Governance', href: '/governance', icon: Building2 },
+  { name: 'Governance', href: '/governance', icon: Shield },
   { name: 'Risk Management', href: '/risk', icon: AlertTriangle },
   { name: 'CSRD Compliance', href: '/csrd', icon: FileText },
   { name: 'AI & Automation', href: '/ai', icon: Brain },
@@ -158,6 +160,7 @@ function AppContent() {
         <div className="p-6">
           <Routes>
             <Route path="/" element={<Dashboard />} />
+            <Route path="/cities" element={<Cities />} />
             <Route path="/climate" element={<ClimateAction />} />
             <Route path="/social" element={<SocialImpact />} />
             <Route path="/governance" element={<Governance />} />
