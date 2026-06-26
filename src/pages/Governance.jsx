@@ -1,82 +1,69 @@
 import React from 'react'
 import {
   Building2, Users, Target, Shield, CheckCircle, AlertTriangle,
-  TrendingUp, FileText, Calendar
+  TrendingUp, FileText, Calendar, Info, Award
 } from 'lucide-react'
-import { impactDimensions, companyProfile } from '../data/esgData'
-
-const governanceDimension = impactDimensions.find(d => d.id === 'governance')
-
-const governanceStructure = [
-  {
-    level: 'Board of Directors',
-    description: 'Strategic oversight and ESG policy approval',
-    members: 12,
-    diversity: '25% female',
-    meetings: 'Monthly'
-  },
-  {
-    level: 'Management Committee',
-    description: 'Executive implementation of ESG strategy',
-    members: 6,
-    diversity: '0% female',
-    meetings: 'Weekly'
-  },
-  {
-    level: 'ESG Office',
-    description: 'Dedicated sustainability coordination team',
-    members: 4,
-    diversity: '50% female',
-    meetings: 'Daily operations'
-  }
-]
-
-const keyPositions = [
-  {
-    role: 'Chief Cooperative Bank Officer',
-    responsibility: 'ESG strategic direction and stakeholder engagement',
-    status: 'Filled',
-    since: 'Sept 2023'
-  },
-  {
-    role: 'ESG Manager',
-    responsibility: 'Day-to-day ESG operations and reporting',
-    status: 'Filled',
-    since: 'Sept 2023'
-  },
-  {
-    role: 'Chief Risk Officer',
-    responsibility: 'Climate and environmental risk integration',
-    status: 'Filled',
-    since: '2021'
-  }
-]
-
-const policyFramework = [
-  { name: 'Environmental Policy', status: 'active', lastReview: '2023' },
-  { name: 'Social Responsibility Policy', status: 'active', lastReview: '2023' },
-  { name: 'Ethics & Conduct Code', status: 'active', lastReview: '2022' },
-  { name: 'Supplier Due Diligence', status: 'in_development', lastReview: 'N/A' },
-  { name: 'Human Rights Policy', status: 'in_development', lastReview: 'N/A' },
-  { name: 'Climate Transition Plan', status: 'in_development', lastReview: 'N/A' }
-]
-
-const shareholderEngagement = {
-  totalShareholders: 284000,
-  engagementMethods: [
-    'Annual General Meeting',
-    'Quarterly newsletters',
-    'Regional cooperative meetings',
-    'Digital feedback platform'
-  ],
-  recentInitiatives: [
-    'ESG survey sent to all shareholders',
-    'Sustainability webinars launched',
-    'Cooperative values communication campaign'
-  ]
-}
+import { useOrganization } from '../context/OrganizationContext'
 
 function Governance() {
+  const { selectedOrg } = useOrganization()
+
+  const hasGovernanceData = selectedOrg.scores?.governance !== null
+
+  // Build governance structure from available data
+  const governanceStructure = [
+    {
+      level: 'Board of Directors',
+      description: 'Strategic oversight and ESG policy approval',
+      members: selectedOrg.governance?.boardSize || 'N/A',
+      diversity: selectedOrg.governance?.boardFemalePercentage !== null
+        ? `${selectedOrg.governance.boardFemalePercentage}% female`
+        : 'N/A',
+      meetings: 'Monthly'
+    },
+    {
+      level: 'Management Committee',
+      description: 'Executive implementation of ESG strategy',
+      members: 'N/A',
+      diversity: selectedOrg.governance?.managementFemalePercentage !== null
+        ? `${selectedOrg.governance.managementFemalePercentage}% female`
+        : 'N/A',
+      meetings: 'Weekly'
+    },
+    {
+      level: 'ESG Committee',
+      description: 'Dedicated sustainability coordination',
+      members: selectedOrg.governance?.esgCommittee ? 'Active' : 'N/A',
+      diversity: 'N/A',
+      meetings: selectedOrg.governance?.esgCommittee ? 'Regular' : 'N/A'
+    }
+  ]
+
+  // Diversity targets
+  const diversityData = []
+
+  if (selectedOrg.governance?.boardFemalePercentage !== null) {
+    diversityData.push({
+      metric: 'Board Female Representation',
+      current: selectedOrg.governance.boardFemalePercentage,
+      target: selectedOrg.governance.boardFemaleTarget?.value || 33,
+      targetYear: selectedOrg.governance.boardFemaleTarget?.year || 2027,
+      status: selectedOrg.governance.boardFemalePercentage >= (selectedOrg.governance.boardFemaleTarget?.value || 33)
+        ? 'achieved' : 'in_progress'
+    })
+  }
+
+  if (selectedOrg.governance?.managementFemalePercentage !== null) {
+    diversityData.push({
+      metric: 'Management Female Representation',
+      current: selectedOrg.governance.managementFemalePercentage,
+      target: 25,
+      targetYear: 2027,
+      status: selectedOrg.governance.managementFemalePercentage >= 25 ? 'achieved' :
+              selectedOrg.governance.managementFemalePercentage === 0 ? 'critical' : 'in_progress'
+    })
+  }
+
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -88,15 +75,54 @@ function Governance() {
               <h2 className="text-2xl font-bold">Governance</h2>
             </div>
             <p className="mt-2 text-blue-100">
-              ESG governance structure, accountability, and stakeholder engagement
+              {selectedOrg.name}'s ESG governance structure, accountability, and leadership
             </p>
           </div>
           <div className="text-right">
-            <div className="text-4xl font-bold">{governanceDimension.score}/10</div>
-            <span className="text-blue-200">{governanceDimension.assessment}</span>
+            {selectedOrg.scores?.governance !== null ? (
+              <>
+                <div className="text-4xl font-bold">{selectedOrg.scores.governance.toFixed(1)}/10</div>
+                <span className="text-blue-200">
+                  {selectedOrg.scores.governance >= 8 ? 'Strong' :
+                   selectedOrg.scores.governance >= 6 ? 'Moderate' : 'Developing'}
+                </span>
+              </>
+            ) : (
+              <span className="text-blue-200">Data Pending</span>
+            )}
           </div>
         </div>
       </div>
+
+      {/* Ratings (if available) */}
+      {(selectedOrg.ratings?.msci || selectedOrg.ratings?.sustainalytics) && (
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {selectedOrg.ratings?.msci && (
+            <div className="bg-white rounded-xl shadow-sm p-5 border border-gray-100 flex items-center space-x-4">
+              <div className="w-14 h-14 bg-blue-100 rounded-xl flex items-center justify-center">
+                <Award className="w-7 h-7 text-blue-600" />
+              </div>
+              <div>
+                <p className="text-sm text-gray-500">MSCI ESG Rating</p>
+                <p className="text-2xl font-bold text-gray-800">{selectedOrg.ratings.msci}</p>
+                <p className="text-xs text-gray-500">Industry Leader Status</p>
+              </div>
+            </div>
+          )}
+          {selectedOrg.ratings?.sustainalytics && (
+            <div className="bg-white rounded-xl shadow-sm p-5 border border-gray-100 flex items-center space-x-4">
+              <div className="w-14 h-14 bg-green-100 rounded-xl flex items-center justify-center">
+                <Shield className="w-7 h-7 text-green-600" />
+              </div>
+              <div>
+                <p className="text-sm text-gray-500">Sustainalytics Risk Rating</p>
+                <p className="text-xl font-bold text-gray-800">{selectedOrg.ratings.sustainalytics}</p>
+                <p className="text-xs text-gray-500">ESG Risk Assessment</p>
+              </div>
+            </div>
+          )}
+        </div>
+      )}
 
       {/* Governance Structure */}
       <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-100">
@@ -132,111 +158,112 @@ function Governance() {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Key Positions */}
+      {/* Diversity & Inclusion */}
+      {diversityData.length > 0 && (
         <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-100">
-          <h3 className="text-lg font-semibold text-gray-800 mb-4">Key ESG Positions</h3>
-          <div className="space-y-4">
-            {keyPositions.map((position, idx) => (
-              <div key={idx} className="p-4 bg-gray-50 rounded-lg">
-                <div className="flex items-start justify-between">
-                  <div>
-                    <h4 className="font-medium text-gray-800">{position.role}</h4>
-                    <p className="text-sm text-gray-500 mt-1">{position.responsibility}</p>
-                  </div>
-                  <span className="px-2 py-1 text-xs font-medium bg-green-100 text-green-700 rounded-full">
-                    {position.status}
-                  </span>
-                </div>
-                <div className="mt-2 flex items-center text-xs text-gray-500">
-                  <Calendar className="w-3 h-3 mr-1" />
-                  Since {position.since}
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* Policy Framework */}
-        <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-100">
-          <h3 className="text-lg font-semibold text-gray-800 mb-4">Policy Framework</h3>
-          <div className="space-y-3">
-            {policyFramework.map((policy, idx) => (
-              <div key={idx} className="flex items-center justify-between p-3 border border-gray-100 rounded-lg">
-                <div className="flex items-center space-x-3">
-                  {policy.status === 'active' ? (
-                    <CheckCircle className="w-5 h-5 text-green-500" />
-                  ) : (
-                    <AlertTriangle className="w-5 h-5 text-yellow-500" />
-                  )}
-                  <span className="text-gray-700">{policy.name}</span>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <span className={`px-2 py-0.5 text-xs rounded-full ${
-                    policy.status === 'active'
-                      ? 'bg-green-100 text-green-700'
-                      : 'bg-yellow-100 text-yellow-700'
+          <h3 className="text-lg font-semibold text-gray-800 mb-4">Diversity & Inclusion Progress</h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {diversityData.map((item, idx) => (
+              <div key={idx} className="p-4 border border-gray-200 rounded-lg">
+                <div className="flex items-center justify-between mb-3">
+                  <span className={`px-2 py-0.5 text-xs font-medium rounded-full ${
+                    item.status === 'achieved' ? 'bg-green-100 text-green-700' :
+                    item.status === 'critical' ? 'bg-red-100 text-red-700' :
+                    'bg-yellow-100 text-yellow-700'
                   }`}>
-                    {policy.status === 'active' ? 'Active' : 'In Development'}
+                    {item.status === 'achieved' ? 'Achieved' :
+                     item.status === 'critical' ? 'Needs Focus' : 'In Progress'}
                   </span>
-                  {policy.lastReview !== 'N/A' && (
-                    <span className="text-xs text-gray-500">Rev. {policy.lastReview}</span>
-                  )}
+                </div>
+                <p className="text-sm text-gray-600 mb-2">{item.metric}</p>
+                <div className="flex items-end space-x-2">
+                  <span className="text-3xl font-bold text-gray-800">{item.current}%</span>
+                  <span className="text-sm text-gray-500 mb-1">/ {item.target}% target</span>
+                </div>
+                <div className="mt-3">
+                  <div className="w-full bg-gray-100 rounded-full h-2">
+                    <div
+                      className={`h-2 rounded-full ${
+                        item.status === 'achieved' ? 'bg-green-500' :
+                        item.status === 'critical' ? 'bg-red-500' :
+                        'bg-yellow-500'
+                      }`}
+                      style={{ width: `${Math.min((item.current / item.target) * 100, 100)}%` }}
+                    />
+                  </div>
+                  <p className="text-xs text-gray-500 mt-1">Target: {item.targetYear}</p>
                 </div>
               </div>
             ))}
           </div>
         </div>
-      </div>
+      )}
 
-      {/* Shareholder Engagement */}
-      <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-100">
-        <h3 className="text-lg font-semibold text-gray-800 mb-4">Cooperative Shareholder Engagement</h3>
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          <div className="text-center p-6 bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl">
-            <Users className="w-10 h-10 text-blue-600 mx-auto mb-3" />
-            <p className="text-3xl font-bold text-gray-800">
-              {shareholderEngagement.totalShareholders.toLocaleString()}
-            </p>
-            <p className="text-sm text-gray-500">Cooperative Shareholders</p>
-          </div>
-
-          <div className="p-4">
-            <h4 className="font-medium text-gray-800 mb-3">Engagement Methods</h4>
-            <ul className="space-y-2">
-              {shareholderEngagement.engagementMethods.map((method, idx) => (
-                <li key={idx} className="flex items-center text-sm text-gray-600">
-                  <CheckCircle className="w-4 h-4 text-green-500 mr-2" />
-                  {method}
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          <div className="p-4">
-            <h4 className="font-medium text-gray-800 mb-3">2023 Initiatives</h4>
-            <ul className="space-y-2">
-              {shareholderEngagement.recentInitiatives.map((initiative, idx) => (
-                <li key={idx} className="flex items-center text-sm text-gray-600">
-                  <TrendingUp className="w-4 h-4 text-blue-500 mr-2" />
-                  {initiative}
-                </li>
-              ))}
-            </ul>
+      {/* Cooperative Status */}
+      {selectedOrg.isCooperative && (
+        <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl p-6 border border-blue-200">
+          <div className="flex items-start space-x-4">
+            <div className="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center">
+              <Users className="w-6 h-6 text-blue-600" />
+            </div>
+            <div>
+              <h3 className="text-lg font-semibold text-blue-800">Cooperative Structure</h3>
+              <p className="text-sm text-blue-700 mt-1">
+                {selectedOrg.name} operates as a cooperative, with governance principles centered on
+                member ownership, democratic decision-making, and community benefit.
+              </p>
+              <div className="mt-3 flex items-center space-x-2 text-sm text-blue-600">
+                <CheckCircle className="w-4 h-4" />
+                <span>Member-owned governance model</span>
+              </div>
+            </div>
           </div>
         </div>
-      </div>
+      )}
 
-      {/* Evidence */}
-      <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl p-6 border border-blue-200">
-        <h3 className="text-lg font-semibold text-blue-800 mb-4">Governance Strengths</h3>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-          {governanceDimension.evidence.map((item, idx) => (
-            <div key={idx} className="flex items-start space-x-3 p-3 bg-white rounded-lg">
-              <CheckCircle className="w-5 h-5 text-blue-500 mt-0.5 flex-shrink-0" />
-              <span className="text-gray-700 text-sm">{item}</span>
+      {/* CSRD Readiness */}
+      <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-100">
+        <h3 className="text-lg font-semibold text-gray-800 mb-4">Compliance Status</h3>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className={`p-4 rounded-lg border ${
+            selectedOrg.compliance?.csrdReady
+              ? 'border-green-200 bg-green-50'
+              : 'border-yellow-200 bg-yellow-50'
+          }`}>
+            <div className="flex items-center space-x-2 mb-2">
+              {selectedOrg.compliance?.csrdReady ? (
+                <CheckCircle className="w-5 h-5 text-green-600" />
+              ) : (
+                <AlertTriangle className="w-5 h-5 text-yellow-600" />
+              )}
+              <span className={`font-medium ${
+                selectedOrg.compliance?.csrdReady ? 'text-green-800' : 'text-yellow-800'
+              }`}>CSRD Ready</span>
             </div>
-          ))}
+            <p className={`text-sm ${
+              selectedOrg.compliance?.csrdReady ? 'text-green-700' : 'text-yellow-700'
+            }`}>
+              {selectedOrg.compliance?.csrdReady
+                ? 'Prepared for CSRD reporting requirements'
+                : 'Preparing for CSRD compliance'}
+            </p>
+          </div>
+
+          <div className="p-4 rounded-lg border border-gray-200 bg-gray-50">
+            <div className="flex items-center space-x-2 mb-2">
+              <FileText className="w-5 h-5 text-gray-600" />
+              <span className="font-medium text-gray-800">Reporting Year</span>
+            </div>
+            <p className="text-sm text-gray-600">{selectedOrg.reportingYear || 2023}</p>
+          </div>
+
+          <div className="p-4 rounded-lg border border-gray-200 bg-gray-50">
+            <div className="flex items-center space-x-2 mb-2">
+              <Calendar className="w-5 h-5 text-gray-600" />
+              <span className="font-medium text-gray-800">Last Updated</span>
+            </div>
+            <p className="text-sm text-gray-600">{selectedOrg.lastUpdated || 'Recent'}</p>
+          </div>
         </div>
       </div>
     </div>

@@ -4,78 +4,76 @@ import {
   XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer
 } from 'recharts'
 import {
-  Leaf, Zap, Car, Sun, TrendingDown, AlertCircle, CheckCircle2, Target
+  Leaf, Zap, Car, Sun, TrendingDown, AlertCircle, CheckCircle2, Target, Info
 } from 'lucide-react'
-import { impactDimensions, emissionsData, timelineData } from '../data/esgData'
-
-const climateDimension = impactDimensions.find(d => d.id === 'climate')
-
-const initiativesData = [
-  {
-    id: 'green_bonds',
-    title: 'Green Bond Issuance',
-    value: '€600M',
-    description: 'Financing for sustainable projects and green initiatives',
-    status: 'active',
-    icon: Leaf,
-    color: '#10B981'
-  },
-  {
-    id: 'ev_policy',
-    title: 'Electric Vehicle Policy',
-    value: '100%',
-    description: 'All company vehicles to be electric from Oct 2023',
-    status: 'active',
-    icon: Car,
-    color: '#3B82F6'
-  },
-  {
-    id: 'solar',
-    title: 'Solar Installation',
-    value: '189.6 kW',
-    description: '468 solar panels installed across facilities',
-    status: 'active',
-    icon: Sun,
-    color: '#F59E0B'
-  },
-  {
-    id: 'energy',
-    title: 'Energy Reduction',
-    value: '-18%',
-    description: 'Electricity consumption reduction at Berchem facility',
-    status: 'active',
-    icon: Zap,
-    color: '#8B5CF6'
-  }
-]
-
-const scope3Categories = [
-  { name: 'Financed Emissions', status: 'In Progress', completion: 25 },
-  { name: 'Business Travel', status: 'Measured', completion: 100 },
-  { name: 'Employee Commuting', status: 'Estimated', completion: 60 },
-  { name: 'Supply Chain', status: 'Not Measured', completion: 0 }
-]
-
-const emissionsBySource = [
-  { name: 'Electricity', value: 55 },
-  { name: 'Natural Gas', value: 20 },
-  { name: 'Vehicle Fleet', value: 15 },
-  { name: 'Other', value: 10 }
-]
+import { useOrganization } from '../context/OrganizationContext'
 
 const COLORS = ['#3B82F6', '#10B981', '#F59E0B', '#8B5CF6']
 
 function ClimateAction() {
-  const emissionsChartData = timelineData.map(d => ({
-    year: d.year,
-    'Scope 1': d.scope1,
-    'Scope 2': d.scope2,
-    projected: d.projected
-  }))
+  const { selectedOrg } = useOrganization()
 
-  const totalCurrentEmissions = emissionsData.scope1.current + emissionsData.scope2.current
-  const totalPreviousEmissions = emissionsData.scope1.previous + emissionsData.scope2.previous
-  const reductionPercentage = ((totalPreviousEmissions - totalCurrentEmissions) / totalPreviousEmissions * 100).toFixed(1)
+  const hasClimateData = selectedOrg.scores?.climate !== null
+
+  // Build initiatives from available data
+  const initiatives = []
+
+  if (selectedOrg.climate?.greenBonds) {
+    initiatives.push({
+      id: 'green_bonds',
+      title: 'Green Bond Issuance',
+      value: `€${(selectedOrg.climate.greenBonds / 1000000).toFixed(0)}M`,
+      description: 'Financing for sustainable projects and green initiatives',
+      icon: Leaf,
+      color: '#10B981'
+    })
+  }
+
+  if (selectedOrg.climate?.evFleetPercentage) {
+    initiatives.push({
+      id: 'ev_policy',
+      title: 'Electric Vehicle Policy',
+      value: `${selectedOrg.climate.evFleetPercentage}%`,
+      description: 'Company vehicle fleet electrification',
+      icon: Car,
+      color: '#3B82F6'
+    })
+  }
+
+  if (selectedOrg.climate?.renewableEnergy) {
+    const isPercentage = selectedOrg.climate.renewableEnergy <= 100
+    initiatives.push({
+      id: 'renewable',
+      title: isPercentage ? 'Renewable Energy' : 'Solar Capacity',
+      value: isPercentage ? `${selectedOrg.climate.renewableEnergy}%` : `${selectedOrg.climate.renewableEnergy} kW`,
+      description: isPercentage ? 'Electricity from renewable sources' : 'Solar panel installation capacity',
+      icon: Sun,
+      color: '#F59E0B'
+    })
+  }
+
+  if (selectedOrg.climate?.emissionsReductionTarget) {
+    initiatives.push({
+      id: 'target',
+      title: 'Emissions Target',
+      value: `-${selectedOrg.climate.emissionsReductionTarget.value}%`,
+      description: `By ${selectedOrg.climate.emissionsReductionTarget.year}${selectedOrg.climate.emissionsReductionTarget.baseline ? ` vs ${selectedOrg.climate.emissionsReductionTarget.baseline}` : ''}`,
+      icon: Target,
+      color: '#8B5CF6'
+    })
+  }
+
+  // Scope 3 categories status
+  const scope3Categories = [
+    {
+      name: 'Financed Emissions',
+      status: selectedOrg.emissions?.scope3?.status === 'calculated' ? 'Calculated' : 'In Progress',
+      completion: selectedOrg.emissions?.scope3?.status === 'calculated' ? 100 : 25
+    },
+    { name: 'Business Travel', status: 'Measured', completion: 100 },
+    { name: 'Employee Commuting', status: 'Estimated', completion: 60 },
+    { name: 'Supply Chain', status: 'In Progress', completion: 30 }
+  ]
 
   return (
     <div className="space-y-6">
@@ -88,65 +86,104 @@ function ClimateAction() {
               <h2 className="text-2xl font-bold">Climate Action</h2>
             </div>
             <p className="mt-2 text-green-100">
-              Tracking environmental impact and carbon reduction initiatives
+              {selectedOrg.name}'s environmental impact and carbon reduction initiatives
             </p>
           </div>
           <div className="text-right">
-            <div className="text-4xl font-bold">{climateDimension.score}/10</div>
-            <span className="text-green-200">{climateDimension.assessment}</span>
+            {selectedOrg.scores?.climate !== null ? (
+              <>
+                <div className="text-4xl font-bold">{selectedOrg.scores.climate.toFixed(1)}/10</div>
+                <span className="text-green-200">
+                  {selectedOrg.scores.climate >= 8 ? 'Strong' :
+                   selectedOrg.scores.climate >= 6 ? 'Moderate' : 'Developing'}
+                </span>
+              </>
+            ) : (
+              <span className="text-green-200">Data Pending</span>
+            )}
           </div>
         </div>
       </div>
 
-      {/* Key Initiatives */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        {initiativesData.map(initiative => {
-          const Icon = initiative.icon
-          return (
-            <div key={initiative.id} className="bg-white rounded-xl shadow-sm p-5 border border-gray-100 metric-card">
-              <div className="flex items-start justify-between">
-                <div
-                  className="w-12 h-12 rounded-xl flex items-center justify-center"
-                  style={{ backgroundColor: `${initiative.color}15` }}
-                >
-                  <Icon className="w-6 h-6" style={{ color: initiative.color }} />
-                </div>
-                <span className="px-2 py-1 text-xs font-medium bg-green-100 text-green-700 rounded-full">
-                  Active
-                </span>
-              </div>
-              <div className="mt-4">
-                <h3 className="font-semibold text-gray-800">{initiative.title}</h3>
-                <p className="text-2xl font-bold mt-1" style={{ color: initiative.color }}>
-                  {initiative.value}
-                </p>
-                <p className="text-sm text-gray-500 mt-2">{initiative.description}</p>
-              </div>
+      {/* CDP Score Banner (if available) */}
+      {selectedOrg.climate?.cdpScore && (
+        <div className="bg-green-50 border border-green-200 rounded-xl p-4">
+          <div className="flex items-center space-x-3">
+            <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
+              <span className="text-2xl font-bold text-green-700">{selectedOrg.climate.cdpScore}</span>
             </div>
-          )
-        })}
-      </div>
+            <div>
+              <p className="font-medium text-green-800">CDP Climate Score: {selectedOrg.climate.cdpScore}</p>
+              <p className="text-sm text-green-700">
+                {selectedOrg.climate.cdpScore === 'A' ? 'Leadership level - implementing best practices' :
+                 selectedOrg.climate.cdpScore === 'A-' ? 'Leadership level' :
+                 'Taking coordinated action on climate issues'}
+              </p>
+            </div>
+            {selectedOrg.climate.sbtiValidated && (
+              <div className="ml-auto px-3 py-1 bg-green-200 text-green-800 rounded-full text-sm font-medium">
+                SBTi Validated
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* Key Initiatives */}
+      {initiatives.length > 0 ? (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          {initiatives.map(initiative => {
+            const Icon = initiative.icon
+            return (
+              <div key={initiative.id} className="bg-white rounded-xl shadow-sm p-5 border border-gray-100 metric-card">
+                <div className="flex items-start justify-between">
+                  <div
+                    className="w-12 h-12 rounded-xl flex items-center justify-center"
+                    style={{ backgroundColor: `${initiative.color}15` }}
+                  >
+                    <Icon className="w-6 h-6" style={{ color: initiative.color }} />
+                  </div>
+                  <span className="px-2 py-1 text-xs font-medium bg-green-100 text-green-700 rounded-full">
+                    Active
+                  </span>
+                </div>
+                <div className="mt-4">
+                  <h3 className="font-semibold text-gray-800">{initiative.title}</h3>
+                  <p className="text-2xl font-bold mt-1" style={{ color: initiative.color }}>
+                    {initiative.value}
+                  </p>
+                  <p className="text-sm text-gray-500 mt-2">{initiative.description}</p>
+                </div>
+              </div>
+            )
+          })}
+        </div>
+      ) : (
+        <div className="bg-yellow-50 border border-yellow-200 rounded-xl p-6 text-center">
+          <Info className="w-10 h-10 text-yellow-500 mx-auto mb-3" />
+          <h4 className="font-medium text-yellow-800">Climate Initiative Data Pending</h4>
+          <p className="text-sm text-yellow-700 mt-1">
+            Upload {selectedOrg.name}'s sustainability report to view detailed climate initiatives.
+          </p>
+        </div>
+      )}
 
       {/* Emissions Overview */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Scope 1 & 2 */}
+        {/* Scope 1 */}
         <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-100">
           <h3 className="text-lg font-semibold text-gray-800 mb-4">Scope 1 Emissions</h3>
           <div className="flex items-end justify-between mb-4">
             <div>
-              <p className="text-3xl font-bold text-blue-600">{emissionsData.scope1.current.toLocaleString()}</p>
-              <p className="text-sm text-gray-500">{emissionsData.scope1.unit}</p>
-            </div>
-            <div className="flex items-center text-green-600">
-              <TrendingDown className="w-4 h-4 mr-1" />
-              <span className="text-sm font-medium">
-                -{((emissionsData.scope1.previous - emissionsData.scope1.current) / emissionsData.scope1.previous * 100).toFixed(0)}%
-              </span>
+              <p className="text-3xl font-bold text-blue-600">
+                {selectedOrg.emissions?.scope1?.value?.toLocaleString() || 'N/A'}
+              </p>
+              <p className="text-sm text-gray-500">tCO2e</p>
             </div>
           </div>
           <div className="space-y-2">
-            <p className="text-xs text-gray-500 font-medium">Sources:</p>
-            {emissionsData.scope1.sources.map((source, idx) => (
+            <p className="text-xs text-gray-500 font-medium">Typical Sources:</p>
+            {['Company vehicles', 'Natural gas heating', 'Refrigerants'].map((source, idx) => (
               <div key={idx} className="flex items-center text-sm text-gray-600">
                 <CheckCircle2 className="w-3 h-3 text-green-500 mr-2" />
                 {source}
@@ -155,23 +192,20 @@ function ClimateAction() {
           </div>
         </div>
 
+        {/* Scope 2 */}
         <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-100">
           <h3 className="text-lg font-semibold text-gray-800 mb-4">Scope 2 Emissions</h3>
           <div className="flex items-end justify-between mb-4">
             <div>
-              <p className="text-3xl font-bold text-green-600">{emissionsData.scope2.current.toLocaleString()}</p>
-              <p className="text-sm text-gray-500">{emissionsData.scope2.unit}</p>
-            </div>
-            <div className="flex items-center text-green-600">
-              <TrendingDown className="w-4 h-4 mr-1" />
-              <span className="text-sm font-medium">
-                -{((emissionsData.scope2.previous - emissionsData.scope2.current) / emissionsData.scope2.previous * 100).toFixed(0)}%
-              </span>
+              <p className="text-3xl font-bold text-green-600">
+                {selectedOrg.emissions?.scope2?.value?.toLocaleString() || 'N/A'}
+              </p>
+              <p className="text-sm text-gray-500">tCO2e</p>
             </div>
           </div>
           <div className="space-y-2">
-            <p className="text-xs text-gray-500 font-medium">Sources:</p>
-            {emissionsData.scope2.sources.map((source, idx) => (
+            <p className="text-xs text-gray-500 font-medium">Typical Sources:</p>
+            {['Purchased electricity', 'District heating'].map((source, idx) => (
               <div key={idx} className="flex items-center text-sm text-gray-600">
                 <CheckCircle2 className="w-3 h-3 text-green-500 mr-2" />
                 {source}
@@ -180,11 +214,14 @@ function ClimateAction() {
           </div>
         </div>
 
+        {/* Scope 3 */}
         <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-100">
           <h3 className="text-lg font-semibold text-gray-800 mb-4">Scope 3 Progress</h3>
           <div className="flex items-center mb-4">
             <AlertCircle className="w-5 h-5 text-yellow-500 mr-2" />
-            <span className="text-sm text-yellow-700">Partially Quantified</span>
+            <span className="text-sm text-yellow-700">
+              {selectedOrg.emissions?.scope3?.status === 'calculated' ? 'Calculated' : 'Partially Quantified'}
+            </span>
           </div>
           <div className="space-y-3">
             {scope3Categories.map((cat, idx) => (
@@ -215,98 +252,29 @@ function ClimateAction() {
         </div>
       </div>
 
-      {/* Charts */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Emissions Trend */}
-        <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-100">
-          <h3 className="text-lg font-semibold text-gray-800 mb-4">Emissions Trajectory</h3>
-          <ResponsiveContainer width="100%" height={300}>
-            <AreaChart data={emissionsChartData}>
-              <defs>
-                <linearGradient id="scope1Gradient" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor="#3B82F6" stopOpacity={0.3}/>
-                  <stop offset="95%" stopColor="#3B82F6" stopOpacity={0}/>
-                </linearGradient>
-                <linearGradient id="scope2Gradient" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor="#10B981" stopOpacity={0.3}/>
-                  <stop offset="95%" stopColor="#10B981" stopOpacity={0}/>
-                </linearGradient>
-              </defs>
-              <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-              <XAxis dataKey="year" stroke="#9ca3af" fontSize={12} />
-              <YAxis stroke="#9ca3af" fontSize={12} />
-              <Tooltip
-                contentStyle={{
-                  backgroundColor: 'white',
-                  border: '1px solid #e5e7eb',
-                  borderRadius: '8px'
-                }}
-              />
-              <Legend />
-              <Area
-                type="monotone"
-                dataKey="Scope 1"
-                stroke="#3B82F6"
-                strokeWidth={2}
-                fill="url(#scope1Gradient)"
-              />
-              <Area
-                type="monotone"
-                dataKey="Scope 2"
-                stroke="#10B981"
-                strokeWidth={2}
-                fill="url(#scope2Gradient)"
-              />
-            </AreaChart>
-          </ResponsiveContainer>
-        </div>
-
-        {/* Emissions by Source */}
-        <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-100">
-          <h3 className="text-lg font-semibold text-gray-800 mb-4">Emissions by Source</h3>
-          <div className="flex items-center justify-center">
-            <ResponsiveContainer width="100%" height={300}>
-              <PieChart>
-                <Pie
-                  data={emissionsBySource}
-                  cx="50%"
-                  cy="50%"
-                  innerRadius={60}
-                  outerRadius={100}
-                  paddingAngle={5}
-                  dataKey="value"
-                  label={({ name, value }) => `${name}: ${value}%`}
-                >
-                  {emissionsBySource.map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                  ))}
-                </Pie>
-                <Tooltip />
-              </PieChart>
-            </ResponsiveContainer>
-          </div>
-        </div>
-      </div>
-
-      {/* Reduction Summary */}
-      <div className="bg-gradient-to-r from-green-50 to-emerald-50 rounded-xl p-6 border border-green-200">
-        <div className="flex items-center justify-between">
-          <div>
-            <h3 className="text-lg font-semibold text-green-800">Total Emissions Reduction</h3>
-            <p className="text-sm text-green-600 mt-1">Year-over-year improvement in Scope 1 & 2 emissions</p>
-          </div>
-          <div className="flex items-center space-x-4">
-            <div className="text-center">
-              <p className="text-3xl font-bold text-green-700">{reductionPercentage}%</p>
-              <p className="text-xs text-green-600">Reduction</p>
+      {/* Net Zero Commitment */}
+      {selectedOrg.climate?.netZeroTarget && (
+        <div className="bg-gradient-to-r from-green-50 to-emerald-50 rounded-xl p-6 border border-green-200">
+          <div className="flex items-center justify-between">
+            <div>
+              <h3 className="text-lg font-semibold text-green-800">Net Zero Commitment</h3>
+              <p className="text-sm text-green-600 mt-1">
+                {selectedOrg.name} has committed to achieving net-zero emissions
+              </p>
             </div>
             <div className="text-center">
-              <p className="text-3xl font-bold text-green-700">{totalCurrentEmissions.toLocaleString()}</p>
-              <p className="text-xs text-green-600">tCO2e Total</p>
+              <p className="text-4xl font-bold text-green-700">{selectedOrg.climate.netZeroTarget}</p>
+              <p className="text-xs text-green-600">Target Year</p>
             </div>
           </div>
+          {selectedOrg.climate.sbtiValidated && (
+            <div className="mt-4 flex items-center space-x-2 text-sm text-green-700">
+              <CheckCircle2 className="w-4 h-4" />
+              <span>Targets validated by Science Based Targets initiative (SBTi)</span>
+            </div>
+          )}
         </div>
-      </div>
+      )}
     </div>
   )
 }

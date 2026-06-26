@@ -16,6 +16,8 @@ import {
   Menu
 } from 'lucide-react'
 
+import { OrganizationProvider } from './context/OrganizationContext'
+import OrganizationSelector from './components/OrganizationSelector'
 import Dashboard from './pages/Dashboard'
 import ClimateAction from './pages/ClimateAction'
 import SocialImpact from './pages/SocialImpact'
@@ -38,7 +40,7 @@ const navigation = [
   { name: 'Data Entry', href: '/data', icon: Settings },
 ]
 
-function App() {
+function AppContent() {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const location = useLocation()
@@ -136,20 +138,17 @@ function App() {
       `}>
         {/* Header */}
         <header className="bg-white shadow-sm border-b border-gray-200 sticky top-0 z-20">
-          <div className="flex items-center justify-between px-6 py-4">
+          <div className="flex items-center justify-between px-6 py-3">
             <div className="flex items-center space-x-4 ml-12 lg:ml-0">
-              <h1 className="text-xl font-semibold text-gray-800">{currentPage}</h1>
+              <OrganizationSelector />
+            </div>
+            <div className="flex items-center space-x-4">
               <span className="px-2 py-1 text-xs font-medium bg-green-100 text-green-700 rounded-full">
                 2023 Report
               </span>
-            </div>
-            <div className="flex items-center space-x-4">
               <div className="flex items-center space-x-2">
                 <span className="w-2 h-2 bg-green-500 rounded-full pulse-indicator"></span>
-                <span className="text-sm text-gray-500">Live Data</span>
-              </div>
-              <div className="w-8 h-8 bg-gray-200 rounded-full flex items-center justify-center">
-                <Users className="w-4 h-4 text-gray-600" />
+                <span className="text-sm text-gray-500">Live</span>
               </div>
             </div>
           </div>
@@ -171,6 +170,14 @@ function App() {
         </div>
       </main>
     </div>
+  )
+}
+
+function App() {
+  return (
+    <OrganizationProvider>
+      <AppContent />
+    </OrganizationProvider>
   )
 }
 
