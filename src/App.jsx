@@ -24,9 +24,11 @@ import RiskManagement from './pages/RiskManagement'
 import CSRDCompliance from './pages/CSRDCompliance'
 import AIAutomation from './pages/AIAutomation'
 import DataEntry from './pages/DataEntry'
+import Comparison from './pages/Comparison'
 
 const navigation = [
   { name: 'Dashboard', href: '/', icon: LayoutDashboard },
+  { name: 'Sector Comparison', href: '/comparison', icon: TrendingUp },
   { name: 'Climate Action', href: '/climate', icon: Leaf },
   { name: 'Social Impact', href: '/social', icon: Users },
   { name: 'Governance', href: '/governance', icon: Building2 },
@@ -164,6 +166,7 @@ function App() {
             <Route path="/csrd" element={<CSRDCompliance />} />
             <Route path="/ai" element={<AIAutomation />} />
             <Route path="/data" element={<DataEntry />} />
+            <Route path="/comparison" element={<Comparison />} />
           </Routes>
         </div>
       </main>
