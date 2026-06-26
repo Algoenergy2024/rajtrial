@@ -1,0 +1,605 @@
+{
+  "metadata": {
+    "lastUpdated": "2026-06-26",
+    "sources": [
+      "Covenant of Mayors",
+      "European Environment Agency",
+      "CDP - Carbon Disclosure Project",
+      "C40 Cities",
+      "Belgian Federal Climate Data",
+      "City Official Reports"
+    ],
+    "notes": "City-level CO2 emissions data is based on available municipal reports. National per capita emissions: 7.15 tonnes CO2eq (2023)"
+  },
+  "nationalContext": {
+    "country": "Belgium",
+    "population": 11763650,
+    "totalEmissions": {
+      "value": 97.9,
+      "unit": "million tonnes CO2eq",
+      "year": 2023
+    },
+    "emissionsPerCapita": {
+      "value": 7.15,
+      "unit": "tonnes CO2eq",
+      "year": 2023
+    },
+    "nationalTarget2030": {
+      "reduction": 47,
+      "unit": "percent",
+      "baseline": 2005,
+      "framework": "EU Effort Sharing Regulation"
+    },
+    "nationalTarget2050": {
+      "goal": "Climate neutrality",
+      "reduction": 95,
+      "unit": "percent",
+      "baseline": 1990
+    },
+    "renewableEnergyTarget2030": {
+      "value": 21.7,
+      "unit": "percent"
+    },
+    "climateRanking": {
+      "index": "Climate Change Performance Index 2026",
+      "rank": 37,
+      "rating": "Low performer"
+    }
+  },
+  "cities": [
+    {
+      "id": "brussels",
+      "name": "Brussels",
+      "nameLocal": "Bruxelles / Brussel",
+      "region": "Brussels-Capital Region",
+      "population": {
+        "value": 1264392,
+        "year": 2025
+      },
+      "area": {
+        "value": 162,
+        "unit": "km²"
+      },
+      "emissions": {
+        "perCapita": {
+          "value": 9.0,
+          "unit": "tonnes CO2eq",
+          "year": 2022,
+          "note": "Regional estimate, above EU average of 8 tCO2eq"
+        },
+        "total": {
+          "value": null,
+          "note": "City-specific data not publicly available"
+        }
+      },
+      "targets": {
+        "shortTerm": {
+          "year": 2030,
+          "reduction": 55,
+          "unit": "percent",
+          "baseline": 2008,
+          "framework": "Brussels Air-Climate-Energy Plan"
+        },
+        "longTerm": {
+          "year": 2050,
+          "goal": "Climate neutrality"
+        }
+      },
+      "renewableEnergy": {
+        "percentage": null,
+        "note": "Actively promoting renewable energy adoption"
+      },
+      "climatePlans": [
+        {
+          "name": "Brussels Air-Climate-Energy Plan",
+          "adoptedYear": 2023,
+          "description": "Integrated plan addressing air quality, climate mitigation, and energy transition"
+        },
+        {
+          "name": "Brussels Climate Plan",
+          "description": "City-level plan targeting 55% GHG reduction by 2030"
+        }
+      ],
+      "ratings": {
+        "covenantOfMayors": {
+          "member": true,
+          "commitment": "40% CO2 reduction by 2030"
+        },
+        "c40Cities": {
+          "member": true,
+          "cohort": "Breathe Cities",
+          "joinedCOP": "COP28"
+        },
+        "cdp": {
+          "score": null,
+          "note": "Participates in CDP reporting"
+        }
+      },
+      "greenInfrastructure": [
+        {
+          "name": "Low Emission Zone (LEZ)",
+          "establishedYear": 2018,
+          "description": "Covers all 19 municipalities, helping avoid 110 premature deaths/year",
+          "healthcareSavings": "€300 million annually"
+        },
+        {
+          "name": "Sustainable Mobility",
+          "description": "Two-thirds of Brussels residents travel on foot, public transport, or bicycle"
+        }
+      ],
+      "keyInitiatives": [
+        "Low Emission Zone covering entire region",
+        "Breathe Cities cohort member (C40)",
+        "Active cycling infrastructure development",
+        "Building energy efficiency programs"
+      ]
+    },
+    {
+      "id": "ghent",
+      "name": "Ghent",
+      "nameLocal": "Gent",
+      "region": "Flanders",
+      "population": {
+        "value": 270000,
+        "year": 2025
+      },
+      "area": {
+        "value": 156,
+        "unit": "km²"
+      },
+      "emissions": {
+        "perCapita": {
+          "value": null,
+          "note": "City-specific data not publicly available"
+        },
+        "total": {
+          "value": null,
+          "note": "Target: climate neutral (zero net emissions)"
+        }
+      },
+      "targets": {
+        "shortTerm": {
+          "year": 2030,
+          "reduction": 40,
+          "unit": "percent",
+          "baseline": 2007,
+          "framework": "Covenant of Mayors / Ghent Climate Plan"
+        },
+        "longTerm": {
+          "year": 2050,
+          "goal": "Climate neutral and 100% renewable energy"
+        }
+      },
+      "renewableEnergy": {
+        "percentage": null,
+        "goal": "100% renewable energy city by 2050"
+      },
+      "climatePlans": [
+        {
+          "name": "Ghent Climate Plan 2020-2025",
+          "description": "Third comprehensive climate plan covering emissions, adaptation, and circularity"
+        },
+        {
+          "name": "Climate-Proof Ghent Initiative",
+          "description": "Adaptation strategy for drought, heat, and flooding resilience"
+        }
+      ],
+      "ratings": {
+        "covenantOfMayors": {
+          "member": true,
+          "commitment": "40% CO2 reduction by 2030",
+          "secapSubmitted": true
+        },
+        "circularCitiesDeclaration": {
+          "member": true,
+          "focus": "Sustainable consumption, food, and circularity"
+        },
+        "cdp": {
+          "score": null,
+          "note": "Participates in CDP reporting"
+        }
+      },
+      "greenInfrastructure": [
+        {
+          "name": "Low Emission Zone",
+          "description": "Implemented to reduce traffic emissions"
+        },
+        {
+          "name": "Circular Economy Initiatives",
+          "description": "Focus on sustainable consumption and waste reduction"
+        }
+      ],
+      "keyInitiatives": [
+        "Climate-proof city adaptation measures",
+        "Circular economy and sustainable food focus",
+        "Comprehensive climate plan beyond direct emissions",
+        "Low emission zone implementation"
+      ]
+    },
+    {
+      "id": "antwerp",
+      "name": "Antwerp",
+      "nameLocal": "Antwerpen",
+      "region": "Flanders",
+      "population": {
+        "value": 545000,
+        "year": 2025
+      },
+      "area": {
+        "value": 204,
+        "unit": "km²"
+      },
+      "emissions": {
+        "perCapita": {
+          "value": null,
+          "note": "Port accounts for 10% of Belgium's total CO2 emissions"
+        },
+        "total": {
+          "value": null,
+          "note": "Includes major industrial port emissions"
+        }
+      },
+      "targets": {
+        "shortTerm": {
+          "year": 2030,
+          "reduction": 55,
+          "unit": "percent",
+          "baseline": null,
+          "framework": "Antwerp Climate Plan 2030"
+        },
+        "longTerm": {
+          "year": 2050,
+          "goal": "Climate neutral city"
+        }
+      },
+      "renewableEnergy": {
+        "percentage": null,
+        "projects": [
+          "Largest onshore wind turbine park in Belgium (Port area)",
+          "Solar energy installations",
+          "Residual heat recovery systems"
+        ]
+      },
+      "climatePlans": [
+        {
+          "name": "Antwerp Climate Plan 2030",
+          "description": "50-55% CO2 reduction target, exceeding EU requirements"
+        },
+        {
+          "name": "Port of Antwerp-Bruges Net Zero Strategy",
+          "targetYear": 2050,
+          "description": "Comprehensive decarbonization of port operations"
+        }
+      ],
+      "ratings": {
+        "covenantOfMayors": {
+          "member": true,
+          "secapSubmitted": true
+        },
+        "netZeroCities": {
+          "member": true,
+          "program": "LINK Inclusive Climate Neutrality pilot"
+        },
+        "cdp": {
+          "score": null,
+          "note": "Participates in CDP reporting"
+        }
+      },
+      "greenInfrastructure": [
+        {
+          "name": "Low Emission Zone",
+          "establishedYear": 2017,
+          "description": "One of Belgium's first LEZs"
+        },
+        {
+          "name": "Heat Networks",
+          "projects": [
+            "New South neighborhood heat network",
+            "Antwerp North industrial residual heat network"
+          ]
+        },
+        {
+          "name": "Cycling Infrastructure",
+          "description": "€40 million investment in port area cycle paths",
+          "goal": "50% of inhabitants using sustainable transport"
+        }
+      ],
+      "keyInitiatives": [
+        "Hydrogen ecosystem development",
+        "Circular economy and waste-to-energy programs",
+        "District heating from industrial residual heat",
+        "Largest onshore wind park in Belgium",
+        "Sustainable port transformation"
+      ]
+    },
+    {
+      "id": "bruges",
+      "name": "Bruges",
+      "nameLocal": "Brugge",
+      "region": "Flanders",
+      "population": {
+        "value": 120000,
+        "year": 2025
+      },
+      "area": {
+        "value": 138,
+        "unit": "km²"
+      },
+      "emissions": {
+        "perCapita": {
+          "value": null,
+          "note": "City-specific data not publicly available"
+        },
+        "total": {
+          "value": null,
+          "note": "Tracking emissions as part of 2030 climate plan"
+        }
+      },
+      "targets": {
+        "shortTerm": {
+          "year": 2030,
+          "reduction": null,
+          "note": "Climate plan in development",
+          "framework": "Zorgen voor Morgen initiative"
+        },
+        "longTerm": {
+          "year": 2050,
+          "goal": "Fossil-free heating"
+        }
+      },
+      "renewableEnergy": {
+        "percentage": 30,
+        "note": "27-30% renewable electricity, leader in Flanders",
+        "year": 2024
+      },
+      "climatePlans": [
+        {
+          "name": "Zorgen voor Morgen (Taking Care of Tomorrow)",
+          "description": "Comprehensive sustainability initiative combining all city sustainable initiatives"
+        },
+        {
+          "name": "2030 Climate Plan",
+          "status": "In development",
+          "focus": "Fossil-free heating transition"
+        }
+      ],
+      "ratings": {
+        "covenantOfMayors": {
+          "member": true
+        },
+        "sustainableTourism": {
+          "initiatives": "Sustainable tourism promotion with bicycle focus"
+        }
+      },
+      "greenInfrastructure": [
+        {
+          "name": "Blue Bikes Program",
+          "description": "Bicycle rental at railway station"
+        },
+        {
+          "name": "Sustainable Tourism Infrastructure",
+          "description": "Bicycle rental points throughout the city"
+        }
+      ],
+      "keyInitiatives": [
+        "Leader in renewable electricity (27-30%)",
+        "Fossil-free heating transition planning",
+        "Sustainable tourism focus",
+        "Bicycle-friendly city infrastructure"
+      ]
+    },
+    {
+      "id": "liege",
+      "name": "Liège",
+      "nameLocal": "Liège / Luik",
+      "region": "Wallonia",
+      "population": {
+        "value": 196000,
+        "year": 2025
+      },
+      "area": {
+        "value": 69,
+        "unit": "km²"
+      },
+      "emissions": {
+        "perCapita": {
+          "value": null,
+          "note": "City-specific data not publicly available"
+        },
+        "total": {
+          "value": null,
+          "note": "Tracking emissions under Covenant of Mayors"
+        }
+      },
+      "targets": {
+        "shortTerm": {
+          "year": 2030,
+          "reduction": 55,
+          "unit": "percent",
+          "baseline": 2005,
+          "framework": "2nd Covenant of Mayors for Climate and Energy"
+        },
+        "longTerm": {
+          "year": 2050,
+          "goal": "Carbon neutrality"
+        }
+      },
+      "renewableEnergy": {
+        "percentage": null,
+        "note": "Part of regional renewable energy targets"
+      },
+      "climatePlans": [
+        {
+          "name": "Liège Climate Plan",
+          "description": "GHG reduction plan and territorial climate adaptation plan"
+        },
+        {
+          "name": "Liège Declaration on Climate Adaptation",
+          "year": 2024,
+          "description": "Adopted during Climate Chance Europe Wallonia Summit, part of Belgian EU Presidency"
+        }
+      ],
+      "ratings": {
+        "covenantOfMayors": {
+          "member": true,
+          "joinedYear": 2015,
+          "commitment": "55% CO2 reduction by 2030"
+        },
+        "circularCitiesDeclaration": {
+          "member": true
+        },
+        "energyCities": {
+          "member": true
+        }
+      },
+      "greenInfrastructure": [
+        {
+          "name": "Smart Bin System",
+          "status": "Pilot testing",
+          "description": "Smart waste management with mobile reporting app"
+        },
+        {
+          "name": "Cycle Path Network",
+          "status": "In development"
+        },
+        {
+          "name": "Energy Renovation Program",
+          "description": "Priority energy efficiency upgrades for municipal buildings"
+        }
+      ],
+      "keyInitiatives": [
+        "55% emissions reduction commitment by 2030",
+        "Smart city waste management pilots",
+        "Building energy renovation program",
+        "Cycle infrastructure development",
+        "Host of Liège Declaration on Climate Adaptation"
+      ]
+    },
+    {
+      "id": "leuven",
+      "name": "Leuven",
+      "nameLocal": "Leuven",
+      "region": "Flanders",
+      "population": {
+        "value": 100000,
+        "year": 2025
+      },
+      "area": {
+        "value": 57,
+        "unit": "km²"
+      },
+      "emissions": {
+        "perCapita": {
+          "value": null,
+          "note": "Target: reduce from 457,000 to 79,000 tonnes CO2 annually"
+        },
+        "total": {
+          "value": 457000,
+          "unit": "tonnes CO2",
+          "year": 2019,
+          "target2030": 79000
+        }
+      },
+      "targets": {
+        "shortTerm": {
+          "year": 2030,
+          "reduction": 80,
+          "unit": "percent",
+          "baseline": 2019,
+          "framework": "EU Mission: 100 Climate-Neutral Cities"
+        },
+        "longTerm": {
+          "year": 2050,
+          "goal": "Complete climate neutrality"
+        }
+      },
+      "renewableEnergy": {
+        "percentage": null,
+        "note": "Part of comprehensive energy transition strategy"
+      },
+      "climatePlans": [
+        {
+          "name": "Leuven Climate City Contract",
+          "pages": 1000,
+          "projects": 87,
+          "description": "Breakthrough projects across all major emitting sectors"
+        },
+        {
+          "name": "Leuven 2030 Roadmap",
+          "description": "Multi-stakeholder collaboration including city, KU Leuven, private sector, and citizens"
+        }
+      ],
+      "ratings": {
+        "euMission100Cities": {
+          "member": true,
+          "selectedYear": 2022,
+          "status": "Pioneering climate city"
+        },
+        "covenantOfMayors": {
+          "member": true
+        },
+        "smartCity": {
+          "initiatives": "AI-powered noise monitoring, smart street lighting"
+        }
+      },
+      "greenInfrastructure": [
+        {
+          "name": "Smart Street Lighting",
+          "description": "AI-controlled lighting based on noise levels, achieved 30% noise reduction"
+        },
+        {
+          "name": "Building Renovation Program",
+          "description": "Focus on old and new building energy efficiency"
+        },
+        {
+          "name": "Green Mobility",
+          "description": "Sustainable transport and active mobility promotion"
+        }
+      ],
+      "keyInitiatives": [
+        "EU Mission 100 Climate-Neutral Cities member",
+        "80% emissions reduction target by 2030 (most ambitious in Belgium)",
+        "87 breakthrough projects in Climate City Contract",
+        "AI-powered smart city innovations",
+        "Multi-stakeholder Leuven 2030 partnership",
+        "€1.3 billion annual investment plan"
+      ],
+      "investmentRequired": {
+        "annual": 1300000000,
+        "currency": "EUR",
+        "additionalStaff": 88.5
+      }
+    }
+  ],
+  "comparativeMetrics": {
+    "mostAmbitiousTarget": {
+      "city": "Leuven",
+      "target": "80% reduction by 2030"
+    },
+    "highestRenewableEnergy": {
+      "city": "Bruges",
+      "percentage": "27-30%"
+    },
+    "largestPopulation": {
+      "city": "Brussels",
+      "population": 1264392
+    },
+    "c40Member": ["Brussels"],
+    "euMission100Cities": ["Leuven"],
+    "covenantOfMayorsMembers": ["Brussels", "Ghent", "Antwerp", "Bruges", "Liège", "Leuven"],
+    "lowEmissionZones": ["Brussels", "Ghent", "Antwerp"]
+  },
+  "sources": {
+    "covenantOfMayors": "https://eu-mayors.ec.europa.eu/",
+    "europeanEnvironmentAgency": "https://www.eea.europa.eu/en/europe-environment-2025/countries/belgium",
+    "cdp": "https://www.cdp.net/en/data/scores",
+    "c40Cities": "https://www.c40.org/",
+    "belgiumClimate": "https://klimaat.be/2050-en",
+    "brusselsClimatePlan": "https://www.brussels.be/climate-plan",
+    "ghentClimateActions": "https://stad.gent/en/city-governance-organisation/city-policy/ghents-climate-actions",
+    "antwerpenClimatePlan": "https://transitionstories.be/en/climate-plan-2030-city-of-antwerp/",
+    "leuven2030": "https://en.leuven2030.be/",
+    "liegeEnergyCities": "https://energy-cities.eu/members/city-of-liege/",
+    "brugesSustainability": "https://www.visitbruges.be/en/things-to-do/about-bruges/sustainable-tourism"
+  }
+}
