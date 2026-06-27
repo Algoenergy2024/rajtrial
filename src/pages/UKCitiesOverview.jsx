@@ -1,25 +1,54 @@
 import React, { useState } from 'react'
 import {
   Flag, MapPin, Users, AlertTriangle, Target, Zap, FileText,
-  ArrowRight, Info, CheckCircle, ClipboardList
+  ArrowRight, Info, CheckCircle, ClipboardList, Factory
 } from 'lucide-react'
 import { useOrganization } from '../context/OrganizationContext'
 import { ukCitiesFull } from '../data/ukCitiesFull'
 
 function UKCitiesOverview() {
   const { setSelectedId } = useOrganization()
-  const [sortBy, setSortBy] = useState('population')
+  const [sortBy, setSortBy] = useState('name')
   const [filterBy, setFilterBy] = useState('all')
 
   const cities = ukCitiesFull
 
+  // Helper to calculate emissions from q3_1_3 data
+  const getCityEmissions = (city) => {
+    const sectors = city.q3_1_3 || []
+    let scope1 = 0, scope2 = 0, scope3 = 0
+    sectors.forEach(sector => {
+      const s1 = parseFloat(sector['Direct emissions (metric tonnes CO2e)^']) || 0
+      const s2 = parseFloat(sector['Indirect emissions from the use of grid-supplied electricity, heat, steam and/or cooling (metric tonnes CO2e)^']) || 0
+      const s3 = parseFloat(sector['Emissions occurring outside the jurisdiction boundary as a result of in-jurisdiction activities (metric tonnes CO2e)']) || 0
+      scope1 += s1
+      scope2 += s2
+      scope3 += s3
+    })
+    return { scope1, scope2, scope3, total: scope1 + scope2 + scope3 }
+  }
+
   // Compute aggregates
+  const totalEmissions = cities.reduce((acc, city) => {
+    const e = getCityEmissions(city)
+    return {
+      scope1: acc.scope1 + e.scope1,
+      scope2: acc.scope2 + e.scope2,
+      scope3: acc.scope3 + e.scope3,
+      total: acc.total + e.total
+    }
+  }, { scope1: 0, scope2: 0, scope3: 0, total: 0 })
+
+  const citiesWithEmissions = cities.filter(c => (c.q3_1_3?.length || 0) > 0).length
+
   const stats = {
     count: cities.length,
     totalPopulation: cities.reduce((sum, c) => {
       const pop = c.q1_2?.population || c.profile?.population || 0
       return sum + pop
     }, 0),
+    emissions: totalEmissions,
+    citiesWithEmissions,
     withHazards: cities.filter(c => (c.q2_2?.length || 0) > 0 || (c.hazards?.length || 0) > 0).length,
     totalHazards: cities.reduce((sum, c) => sum + (c.q2_2?.length || c.hazards?.length || 0), 0),
     withTargets: cities.filter(c => (c.q6_1_1?.length || 0) > 0 || (c.targets?.length || 0) > 0).length,
@@ -87,6 +116,33 @@ function UKCitiesOverview() {
           <Info className="w-4 h-4" />
           CDP 2025 comprehensive city questionnaire responses
         </p>
+      </div>
+
+      {/* Emissions Overview */}
+      <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-6">
+        <div className="flex items-center gap-2 mb-4">
+          <Factory className="w-5 h-5 text-purple-600" />
+          <h2 className="font-semibold text-gray-800">Total Emissions (tCO2e)</h2>
+          <span className="text-xs text-gray-500 ml-2">from {stats.citiesWithEmissions} reporting entities</span>
+        </div>
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <div className="bg-purple-50 rounded-xl p-4">
+            <p className="text-sm text-purple-600 font-medium mb-1">Scope 1 (Direct)</p>
+            <p className="text-2xl font-bold text-purple-700">{formatNumber(stats.emissions.scope1)}</p>
+          </div>
+          <div className="bg-indigo-50 rounded-xl p-4">
+            <p className="text-sm text-indigo-600 font-medium mb-1">Scope 2 (Grid)</p>
+            <p className="text-2xl font-bold text-indigo-700">{formatNumber(stats.emissions.scope2)}</p>
+          </div>
+          <div className="bg-blue-50 rounded-xl p-4">
+            <p className="text-sm text-blue-600 font-medium mb-1">Scope 3 (Outside)</p>
+            <p className="text-2xl font-bold text-blue-700">{formatNumber(stats.emissions.scope3)}</p>
+          </div>
+          <div className="bg-gray-100 rounded-xl p-4">
+            <p className="text-sm text-gray-600 font-medium mb-1">Total</p>
+            <p className="text-2xl font-bold text-gray-800">{formatNumber(stats.emissions.total)}</p>
+          </div>
+        </div>
       </div>
 
       {/* Stats Grid */}
