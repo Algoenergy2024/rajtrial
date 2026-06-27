@@ -21,7 +21,8 @@ import {
   Factory,
   Zap,
   Target,
-  ClipboardList
+  ClipboardList,
+  Home
 } from 'lucide-react'
 
 import { OrganizationProvider, useOrganization, CATEGORIES } from './context/OrganizationContext'
@@ -370,12 +371,18 @@ function AppContent() {
           {/* Top Bar - Branding & Global */}
           <div className="flex items-center justify-between px-4 py-2 border-b border-gray-100">
             <div className="flex items-center gap-3 ml-10 lg:ml-0">
-              <div className="hidden lg:flex items-center gap-2">
-                <div className="w-7 h-7 bg-gradient-to-br from-green-500 to-blue-600 rounded-lg flex items-center justify-center">
+              {/* Home Button */}
+              <button
+                onClick={() => navigate('/')}
+                className="flex items-center gap-2 px-2 py-1.5 rounded-lg hover:bg-gray-100 transition-colors group"
+                title="Back to main dashboard"
+              >
+                <div className="w-7 h-7 bg-gradient-to-br from-green-500 to-blue-600 rounded-lg flex items-center justify-center group-hover:scale-105 transition-transform">
                   <Leaf className="w-4 h-4 text-white" />
                 </div>
-                <span className="font-bold text-gray-800 text-sm">ESG Platform</span>
-              </div>
+                <span className="hidden lg:inline font-bold text-gray-800 text-sm">ESG Platform</span>
+                <Home className="w-4 h-4 text-gray-400 group-hover:text-green-600 transition-colors" />
+              </button>
             </div>
             <div className="flex items-center gap-3">
               <span className="px-2.5 py-1 text-xs font-semibold bg-green-100 text-green-700 rounded-full">
