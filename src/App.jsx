@@ -33,6 +33,7 @@ import Comparison from './pages/Comparison'
 import Cities from './pages/Cities'
 import CityDetail from './pages/CityDetail'
 import UKCityDetail from './pages/UKCityDetail'
+import UKCityDashboard from './pages/UKCityDashboard'
 
 // Navigation for financial entities
 const financialNavigation = [
@@ -54,9 +55,10 @@ const citiesNavigation = [
   { name: 'Comparison', href: '/comparison', icon: TrendingUp },
 ]
 
-// Navigation for UK cities (Q1 detailed data)
+// Navigation for UK cities (full CDP data)
 const ukCitiesNavigation = [
-  { name: 'City Detail (Q1)', href: '/uk-city', icon: Flag },
+  { name: 'Dashboard', href: '/uk-dashboard', icon: LayoutDashboard },
+  { name: 'Full Q1 Detail', href: '/uk-city', icon: FileText },
   { name: 'All UK Entities', href: '/cities', icon: Globe },
 ]
 
@@ -260,6 +262,7 @@ function AppContent() {
           <Routes>
             <Route path="/" element={<Dashboard />} />
             <Route path="/city" element={<CityDetail />} />
+            <Route path="/uk-dashboard" element={<UKCityDashboard />} />
             <Route path="/uk-city" element={<UKCityDetail />} />
             <Route path="/cities" element={<Cities />} />
             <Route path="/climate" element={<ClimateAction />} />

@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useState } from 'react'
 import { entities, getEntityById, entityTypes } from '../data/belgianEntities'
 import { europeanCities, getCityById, europeanCountries } from '../data/europeanCities'
-import { ukCities, getUKCityById } from '../data/ukCities'
+import { ukCitiesFull as ukCities, getUKCityById } from '../data/ukCitiesFull'
 
 export const CATEGORIES = {
   BELGIAN_BANKS: 'belgian_banks',
