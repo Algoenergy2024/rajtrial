@@ -10,6 +10,7 @@ import {
   Settings,
   ChevronLeft,
   ChevronRight,
+  ChevronDown,
   Building2,
   TrendingUp,
   AlertTriangle,
@@ -62,6 +63,8 @@ import BanksDashboard from './pages/BanksDashboard'
 import InsuranceDashboard from './pages/InsuranceDashboard'
 import EUCitiesDashboard from './pages/EUCitiesDashboard'
 import UKCitiesOverview from './pages/UKCitiesOverview'
+import UKCityComparison from './pages/UKCityComparison'
+import UKAIAutomation from './pages/UKAIAutomation'
 
 // Navigation for Belgian Banks
 const banksNavigation = [
@@ -101,6 +104,13 @@ const citiesNavigation = [
 const ukCitiesNavigation = [
   { name: 'Overview', href: '/uk-cities', icon: LayoutDashboard },
   { name: 'Entity Dashboard', href: '/uk-dashboard', icon: MapPin },
+  { name: 'CDP Questions', href: null, icon: FileText, isDropdown: true },
+  { name: 'City Comparison', href: '/uk-comparison', icon: TrendingUp },
+  { name: 'AI & Automation', href: '/uk-ai', icon: Brain },
+]
+
+// CDP Question pages for UK Cities dropdown
+const ukCDPQuestions = [
   { name: 'Q1 Profile', href: '/uk-city', icon: FileText },
   { name: 'Q2 Hazards', href: '/uk-q2', icon: CloudRain },
   { name: 'Q3 Emissions', href: '/uk-q3', icon: Factory },
@@ -111,7 +121,6 @@ const ukCitiesNavigation = [
   { name: 'Q8 Plans', href: '/uk-q8', icon: ClipboardList },
   { name: 'Q9 Actions', href: '/uk-q9', icon: Zap },
   { name: 'Q11 Additional', href: '/uk-q11', icon: FileText },
-  { name: 'All UK Entities', href: '/cities', icon: Globe },
 ]
 
 // CDP Regions for cities sidebar
@@ -185,9 +194,13 @@ const ukSectionsByPage = {
 function AppContent() {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+  const [cdpDropdownOpen, setCdpDropdownOpen] = useState(false)
   const location = useLocation()
   const navigate = useNavigate()
   const { category, setCategory, isCity, isUKCity, isEuropeanCity } = useOrganization()
+
+  // Check if current page is a CDP question page
+  const isOnCDPPage = ukCDPQuestions.some(q => q.href === location.pathname)
 
   const navigation = isUKCity
     ? ukCitiesNavigation
@@ -262,7 +275,7 @@ function AppContent() {
               {category === CATEGORIES.BELGIAN_BANKS && '🏦 Belgian Banks'}
               {category === CATEGORIES.BELGIAN_INSURANCE && '🛡️ Belgian Insurance'}
               {category === CATEGORIES.EUROPEAN_CITIES && '🏙️ European Cities'}
-              {category === CATEGORIES.UK_CITIES && '🇬🇧 UK Cities (Q1)'}
+              {category === CATEGORIES.UK_CITIES && '🇬🇧 UK Cities'}
             </div>
           </div>
         )}
@@ -272,7 +285,62 @@ function AppContent() {
           <ul className="space-y-1">
             {navigation.map((item) => {
               const Icon = item.icon
-              const isActive = location.pathname === item.href
+              const isActive = item.href ? location.pathname === item.href : isOnCDPPage
+
+              // Handle dropdown items (CDP Questions)
+              if (item.isDropdown && isUKCity) {
+                return (
+                  <li key={item.name}>
+                    <button
+                      onClick={() => setCdpDropdownOpen(!cdpDropdownOpen)}
+                      className={`
+                        w-full flex items-center justify-between px-3 py-2.5 rounded-lg transition-all duration-200
+                        ${isActive
+                          ? 'bg-gradient-to-r from-green-500 to-green-600 text-white shadow-md'
+                          : 'text-gray-600 hover:bg-gray-100'
+                        }
+                      `}
+                    >
+                      <div className="flex items-center">
+                        <Icon className={`w-5 h-5 ${sidebarCollapsed ? 'mx-auto' : 'mr-3'}`} />
+                        {!sidebarCollapsed && <span className="font-medium">{item.name}</span>}
+                      </div>
+                      {!sidebarCollapsed && (
+                        <ChevronDown className={`w-4 h-4 transition-transform ${cdpDropdownOpen ? 'rotate-180' : ''}`} />
+                      )}
+                    </button>
+                    {/* Dropdown content */}
+                    {cdpDropdownOpen && !sidebarCollapsed && (
+                      <ul className="mt-1 ml-4 space-y-1 border-l-2 border-gray-200 pl-3">
+                        {ukCDPQuestions.map((q) => {
+                          const QIcon = q.icon
+                          const qActive = location.pathname === q.href
+                          return (
+                            <li key={q.name}>
+                              <NavLink
+                                to={q.href}
+                                onClick={() => setMobileMenuOpen(false)}
+                                className={`
+                                  flex items-center px-3 py-2 rounded-lg text-sm transition-all duration-200
+                                  ${qActive
+                                    ? 'bg-indigo-100 text-indigo-700 font-medium'
+                                    : 'text-gray-600 hover:bg-gray-100'
+                                  }
+                                `}
+                              >
+                                <QIcon className="w-4 h-4 mr-2" />
+                                <span>{q.name}</span>
+                              </NavLink>
+                            </li>
+                          )
+                        })}
+                      </ul>
+                    )}
+                  </li>
+                )
+              }
+
+              // Regular navigation items
               return (
                 <li key={item.name}>
                   <NavLink
@@ -450,6 +518,8 @@ function AppContent() {
             <Route path="/uk-q8" element={<UKQ8Detail />} />
             <Route path="/uk-q9" element={<UKQ9Detail />} />
             <Route path="/uk-q11" element={<UKQ11Detail />} />
+            <Route path="/uk-comparison" element={<UKCityComparison />} />
+            <Route path="/uk-ai" element={<UKAIAutomation />} />
             <Route path="/cities" element={<Cities />} />
             <Route path="/climate" element={<ClimateAction />} />
             <Route path="/social" element={<SocialImpact />} />
