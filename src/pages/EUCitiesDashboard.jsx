@@ -1,33 +1,52 @@
 import React, { useState } from 'react'
 import {
   Globe, MapPin, Users, AlertTriangle, Target, Factory,
-  ArrowRight, Info, ChevronDown
+  ArrowRight, Info
 } from 'lucide-react'
 import { useOrganization } from '../context/OrganizationContext'
 import { europeanCities, europeanCountries } from '../data/europeanCities'
 
 function EUCitiesDashboard() {
   const { setSelectedId, selectedCountry, setSelectedCountry } = useOrganization()
-  const [sortBy, setSortBy] = useState('population')
+  const [sortBy, setSortBy] = useState('name')
+
+  // Exclude UK cities (they have their own dedicated section)
+  const euCities = europeanCities.filter(c => c.country !== 'United Kingdom')
+  const euCountries = europeanCountries.filter(c => c !== 'United Kingdom')
 
   // Filter by country if selected
   const filteredCities = selectedCountry === 'all'
-    ? europeanCities
-    : europeanCities.filter(c => c.country === selectedCountry)
+    ? euCities
+    : euCities.filter(c => c.country === selectedCountry)
+
+  // Calculate emissions totals
+  const totalEmissions = filteredCities.reduce((acc, city) => {
+    const e = city.emissions || {}
+    return {
+      scope1: acc.scope1 + (e.scope1 || 0),
+      scope2: acc.scope2 + (e.scope2 || 0),
+      scope3: acc.scope3 + (e.scope3 || 0),
+      total: acc.total + (e.total || 0)
+    }
+  }, { scope1: 0, scope2: 0, scope3: 0, total: 0 })
+
+  const citiesWithEmissions = filteredCities.filter(c => c.emissions?.total > 0).length
 
   // Compute aggregates
   const stats = {
-    totalCities: europeanCities.length,
+    totalCities: euCities.length,
     filteredCount: filteredCities.length,
-    countries: europeanCountries.length,
+    countries: euCountries.length,
     totalPopulation: filteredCities.reduce((sum, c) => sum + (c.population || 0), 0),
+    emissions: totalEmissions,
+    citiesWithEmissions,
     withHazards: filteredCities.filter(c => c.hazards?.length > 0).length,
     totalHazards: filteredCities.reduce((sum, c) => sum + (c.hazards?.length || 0), 0),
     withTargets: filteredCities.filter(c => c.target?.year).length,
-    byCountry: europeanCountries.map(country => ({
+    byCountry: euCountries.map(country => ({
       country,
-      count: europeanCities.filter(c => c.country === country).length,
-      population: europeanCities.filter(c => c.country === country).reduce((s, c) => s + (c.population || 0), 0)
+      count: euCities.filter(c => c.country === country).length,
+      population: euCities.filter(c => c.country === country).reduce((s, c) => s + (c.population || 0), 0)
     })).sort((a, b) => b.count - a.count)
   }
 
@@ -100,6 +119,33 @@ function EUCitiesDashboard() {
             Have Targets
           </div>
           <p className="text-2xl font-bold text-gray-800">{stats.withTargets}</p>
+        </div>
+      </div>
+
+      {/* Emissions Overview */}
+      <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-6">
+        <div className="flex items-center gap-2 mb-4">
+          <Factory className="w-5 h-5 text-purple-600" />
+          <h2 className="font-semibold text-gray-800">Total Emissions (tCO2e)</h2>
+          <span className="text-xs text-gray-500 ml-2">from {stats.citiesWithEmissions} reporting cities</span>
+        </div>
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <div className="bg-purple-50 rounded-xl p-4">
+            <p className="text-sm text-purple-600 font-medium mb-1">Scope 1 (Direct)</p>
+            <p className="text-2xl font-bold text-purple-700">{formatNumber(stats.emissions.scope1)}</p>
+          </div>
+          <div className="bg-indigo-50 rounded-xl p-4">
+            <p className="text-sm text-indigo-600 font-medium mb-1">Scope 2 (Grid)</p>
+            <p className="text-2xl font-bold text-indigo-700">{formatNumber(stats.emissions.scope2)}</p>
+          </div>
+          <div className="bg-blue-50 rounded-xl p-4">
+            <p className="text-sm text-blue-600 font-medium mb-1">Scope 3 (Outside)</p>
+            <p className="text-2xl font-bold text-blue-700">{formatNumber(stats.emissions.scope3)}</p>
+          </div>
+          <div className="bg-gray-100 rounded-xl p-4">
+            <p className="text-sm text-gray-600 font-medium mb-1">Total</p>
+            <p className="text-2xl font-bold text-gray-800">{formatNumber(stats.emissions.total)}</p>
+          </div>
         </div>
       </div>
 
