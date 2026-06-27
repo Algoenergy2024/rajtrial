@@ -56,10 +56,11 @@ import UKQ7Detail from './pages/UKQ7Detail'
 import UKQ8Detail from './pages/UKQ8Detail'
 import UKQ9Detail from './pages/UKQ9Detail'
 import UKQ11Detail from './pages/UKQ11Detail'
+import LandingDashboard from './pages/LandingDashboard'
 
 // Navigation for financial entities
 const financialNavigation = [
-  { name: 'Dashboard', href: '/', icon: LayoutDashboard },
+  { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
   { name: 'Sector Comparison', href: '/comparison', icon: TrendingUp },
   { name: 'Climate Action', href: '/climate', icon: Leaf },
   { name: 'Social Impact', href: '/social', icon: Users },
@@ -186,7 +187,7 @@ function AppContent() {
         navigate('/city')
         break
       default:
-        navigate('/')
+        navigate('/dashboard')
     }
   }
 
@@ -399,7 +400,8 @@ function AppContent() {
         {/* Page content */}
         <div className="p-6">
           <Routes>
-            <Route path="/" element={<Dashboard />} />
+            <Route path="/" element={<LandingDashboard />} />
+            <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/city" element={<CityDetail />} />
             <Route path="/uk-dashboard" element={<UKCityDashboard />} />
             <Route path="/uk-city" element={<UKCityDetail />} />
