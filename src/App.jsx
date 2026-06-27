@@ -13,10 +13,12 @@ import {
   Building2,
   TrendingUp,
   AlertTriangle,
-  Menu
+  Menu,
+  Globe,
+  MapPin
 } from 'lucide-react'
 
-import { OrganizationProvider } from './context/OrganizationContext'
+import { OrganizationProvider, useOrganization, CATEGORIES } from './context/OrganizationContext'
 import OrganizationSelector from './components/OrganizationSelector'
 import Dashboard from './pages/Dashboard'
 import ClimateAction from './pages/ClimateAction'
@@ -28,10 +30,11 @@ import AIAutomation from './pages/AIAutomation'
 import DataEntry from './pages/DataEntry'
 import Comparison from './pages/Comparison'
 import Cities from './pages/Cities'
+import CityDetail from './pages/CityDetail'
 
-const navigation = [
+// Navigation for financial entities
+const financialNavigation = [
   { name: 'Dashboard', href: '/', icon: LayoutDashboard },
-  { name: 'Belgian Cities', href: '/cities', icon: Building2 },
   { name: 'Sector Comparison', href: '/comparison', icon: TrendingUp },
   { name: 'Climate Action', href: '/climate', icon: Leaf },
   { name: 'Social Impact', href: '/social', icon: Users },
@@ -42,12 +45,26 @@ const navigation = [
   { name: 'Data Entry', href: '/data', icon: Settings },
 ]
 
+// Navigation for cities
+const citiesNavigation = [
+  { name: 'City Overview', href: '/city', icon: MapPin },
+  { name: 'All Cities', href: '/cities', icon: Globe },
+  { name: 'Comparison', href: '/comparison', icon: TrendingUp },
+]
+
+// CDP Regions for cities sidebar
+const cdpRegions = [
+  { name: 'Europe', code: 'Europe', count: 148 },
+  { name: 'UK & Western', code: 'UKWW', count: 59 },
+]
+
 function AppContent() {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const location = useLocation()
+  const { category, isCity } = useOrganization()
 
-  const currentPage = navigation.find(item => item.href === location.pathname)?.name || 'Dashboard'
+  const navigation = isCity ? citiesNavigation : financialNavigation
 
   return (
     <div className="min-h-screen bg-gray-100">
@@ -84,8 +101,21 @@ function AppContent() {
           )}
         </div>
 
+        {/* Category Badge */}
+        {!sidebarCollapsed && (
+          <div className="px-4 py-3 border-b border-gray-100">
+            <div className={`px-3 py-2 rounded-lg text-sm font-medium ${
+              isCity ? 'bg-green-50 text-green-700' : 'bg-blue-50 text-blue-700'
+            }`}>
+              {category === CATEGORIES.BELGIAN_BANKS && '🏦 Belgian Banks'}
+              {category === CATEGORIES.BELGIAN_INSURANCE && '🛡️ Belgian Insurance'}
+              {category === CATEGORIES.EUROPEAN_CITIES && '🏙️ European Cities'}
+            </div>
+          </div>
+        )}
+
         {/* Navigation */}
-        <nav className="mt-6 px-3">
+        <nav className="mt-4 px-3">
           <ul className="space-y-1">
             {navigation.map((item) => {
               const Icon = item.icon
@@ -111,6 +141,24 @@ function AppContent() {
             })}
           </ul>
         </nav>
+
+        {/* CDP Regions (for cities) */}
+        {isCity && !sidebarCollapsed && (
+          <div className="mt-6 px-4">
+            <p className="text-xs font-semibold text-gray-400 uppercase mb-2">CDP Regions</p>
+            <div className="space-y-1">
+              {cdpRegions.map(region => (
+                <div
+                  key={region.code}
+                  className="flex items-center justify-between px-3 py-2 text-sm text-gray-600 rounded-lg hover:bg-gray-50"
+                >
+                  <span>{region.name}</span>
+                  <span className="text-xs bg-gray-100 px-2 py-0.5 rounded-full">{region.count}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
 
         {/* Collapse button */}
         <button
@@ -146,7 +194,7 @@ function AppContent() {
             </div>
             <div className="flex items-center space-x-4">
               <span className="px-2 py-1 text-xs font-medium bg-green-100 text-green-700 rounded-full">
-                2023 Report
+                CDP 2025
               </span>
               <div className="flex items-center space-x-2">
                 <span className="w-2 h-2 bg-green-500 rounded-full pulse-indicator"></span>
@@ -160,6 +208,7 @@ function AppContent() {
         <div className="p-6">
           <Routes>
             <Route path="/" element={<Dashboard />} />
+            <Route path="/city" element={<CityDetail />} />
             <Route path="/cities" element={<Cities />} />
             <Route path="/climate" element={<ClimateAction />} />
             <Route path="/social" element={<SocialImpact />} />
