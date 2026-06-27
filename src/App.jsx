@@ -58,6 +58,16 @@ import UKQ7Detail from './pages/UKQ7Detail'
 import UKQ8Detail from './pages/UKQ8Detail'
 import UKQ9Detail from './pages/UKQ9Detail'
 import UKQ11Detail from './pages/UKQ11Detail'
+import EUQ1Detail from './pages/EUQ1Detail'
+import EUQ2Detail from './pages/EUQ2Detail'
+import EUQ3Detail from './pages/EUQ3Detail'
+import EUQ4Detail from './pages/EUQ4Detail'
+import EUQ5Detail from './pages/EUQ5Detail'
+import EUQ6Detail from './pages/EUQ6Detail'
+import EUQ7Detail from './pages/EUQ7Detail'
+import EUQ8Detail from './pages/EUQ8Detail'
+import EUQ9Detail from './pages/EUQ9Detail'
+import EUQ11Detail from './pages/EUQ11Detail'
 import LandingDashboard from './pages/LandingDashboard'
 import BanksDashboard from './pages/BanksDashboard'
 import InsuranceDashboard from './pages/InsuranceDashboard'
@@ -545,16 +555,16 @@ function AppContent() {
             <Route path="/eu-dashboard" element={<EUCityDashboard />} />
             <Route path="/eu-comparison" element={<EUCityComparison />} />
             <Route path="/eu-ai" element={<EUAIAutomation />} />
-            <Route path="/eu-q1" element={<EUCityDashboard />} />
-            <Route path="/eu-q2" element={<EUCityDashboard />} />
-            <Route path="/eu-q3" element={<EUCityDashboard />} />
-            <Route path="/eu-q4" element={<EUCityDashboard />} />
-            <Route path="/eu-q5" element={<EUCityDashboard />} />
-            <Route path="/eu-q6" element={<EUCityDashboard />} />
-            <Route path="/eu-q7" element={<EUCityDashboard />} />
-            <Route path="/eu-q8" element={<EUCityDashboard />} />
-            <Route path="/eu-q9" element={<EUCityDashboard />} />
-            <Route path="/eu-q11" element={<EUCityDashboard />} />
+            <Route path="/eu-q1" element={<EUQ1Detail />} />
+            <Route path="/eu-q2" element={<EUQ2Detail />} />
+            <Route path="/eu-q3" element={<EUQ3Detail />} />
+            <Route path="/eu-q4" element={<EUQ4Detail />} />
+            <Route path="/eu-q5" element={<EUQ5Detail />} />
+            <Route path="/eu-q6" element={<EUQ6Detail />} />
+            <Route path="/eu-q7" element={<EUQ7Detail />} />
+            <Route path="/eu-q8" element={<EUQ8Detail />} />
+            <Route path="/eu-q9" element={<EUQ9Detail />} />
+            <Route path="/eu-q11" element={<EUQ11Detail />} />
             <Route path="/cities" element={<Cities />} />
             <Route path="/climate" element={<ClimateAction />} />
             <Route path="/social" element={<SocialImpact />} />

@@ -43,7 +43,7 @@ function EUCitiesDashboard() {
 
   const citiesWithEmissions = filteredCities.filter(c => (c.q3_1_3?.length || 0) > 0).length
 
-  const getPopulation = (city) => city.q1_2?.[0]?.population || city.q1_2?.[0]?.['Population^'] || 0
+  const getPopulation = (city) => city.profile?.population || 0
 
   // Compute aggregates
   const stats = {
