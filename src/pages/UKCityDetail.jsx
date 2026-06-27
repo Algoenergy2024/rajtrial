@@ -85,7 +85,7 @@ function UKCityDetail() {
       </div>
 
       {/* Q1.1 & Q1.2 - City Profile */}
-      <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+      <div id="q1_2" className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden scroll-mt-20">
         <div className="bg-blue-50 px-5 py-3 border-b border-blue-100">
           <h3 className="font-semibold text-blue-800 flex items-center">
             <FileText className="w-4 h-4 mr-2" />
@@ -168,7 +168,7 @@ function UKCityDetail() {
       </div>
 
       {/* Q1.3 - Climate Oversight */}
-      <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+      <div id="q1_3" className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden scroll-mt-20">
         <div className="bg-green-50 px-5 py-3 border-b border-green-100">
           <h3 className="font-semibold text-green-800 flex items-center">
             <Shield className="w-4 h-4 mr-2" />
@@ -223,7 +223,7 @@ function UKCityDetail() {
       </div>
 
       {/* Q1.4 - Climate Opportunities */}
-      <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+      <div id="q1_4" className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden scroll-mt-20">
         <div className="bg-purple-50 px-5 py-3 border-b border-purple-100">
           <h3 className="font-semibold text-purple-800 flex items-center">
             <Target className="w-4 h-4 mr-2" />
@@ -289,7 +289,7 @@ function UKCityDetail() {
       </div>
 
       {/* Q1.5 - Government Engagement */}
-      <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+      <div id="q1_5" className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden scroll-mt-20">
         <div className="bg-teal-50 px-5 py-3 border-b border-teal-100">
           <h3 className="font-semibold text-teal-800 flex items-center">
             <Network className="w-4 h-4 mr-2" />
@@ -298,41 +298,43 @@ function UKCityDetail() {
         </div>
         <div className="p-5">
           {q1_5.length > 0 ? (
-            <div className="overflow-x-auto">
-              <table className="w-full text-sm">
-                <thead>
-                  <tr className="border-b border-gray-200">
-                    <th className="text-left py-2 px-3 font-medium text-gray-600">Climate Component</th>
-                    <th className="text-left py-2 px-3 font-medium text-gray-600">Govt Levels Engaged</th>
-                    <th className="text-left py-2 px-3 font-medium text-gray-600">Purpose</th>
-                    <th className="text-left py-2 px-3 font-medium text-gray-600">Comment</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {q1_5.map((engagement, idx) => (
-                    <tr key={idx} className="border-b border-gray-100 hover:bg-gray-50">
-                      <td className="py-3 px-3">
-                        <span className="px-2 py-1 bg-teal-50 text-teal-700 rounded text-xs font-medium">
-                          {engagement.climateComponent || 'N/A'}
-                        </span>
-                      </td>
-                      <td className="py-3 px-3 text-gray-700">
+            <div className="space-y-4">
+              {q1_5.map((engagement, idx) => (
+                <div key={idx} className="border border-gray-200 rounded-lg p-4 hover:border-teal-300 transition-colors">
+                  <div className="flex items-start justify-between mb-3">
+                    <span className="px-3 py-1 bg-teal-100 text-teal-700 rounded-full text-sm font-medium">
+                      {engagement.climateComponent || 'N/A'}
+                    </span>
+                    {engagement.govtLevelsEngaged && (
+                      <div className="flex flex-wrap gap-1 justify-end">
                         {splitPipeDelimited(engagement.govtLevelsEngaged).map((level, i) => (
-                          <span key={i} className="block">{level}</span>
+                          <span key={i} className="px-2 py-0.5 bg-gray-100 text-gray-600 rounded text-xs">
+                            {level}
+                          </span>
                         ))}
-                      </td>
-                      <td className="py-3 px-3 text-gray-700 max-w-xs">
-                        {engagement.engagementPurpose?.substring(0, 150)}
-                        {engagement.engagementPurpose?.length > 150 && '...'}
-                      </td>
-                      <td className="py-3 px-3 text-gray-600 text-xs max-w-xs">
-                        {engagement.comment?.substring(0, 100)}
-                        {engagement.comment?.length > 100 && '...'}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+                      </div>
+                    )}
+                  </div>
+
+                  {engagement.engagementPurpose && (
+                    <div className="mb-3">
+                      <h4 className="text-xs font-medium text-gray-500 mb-1">Purpose</h4>
+                      <p className="text-sm text-gray-700 bg-teal-50 p-3 rounded-lg">
+                        {engagement.engagementPurpose}
+                      </p>
+                    </div>
+                  )}
+
+                  {engagement.comment && (
+                    <div>
+                      <h4 className="text-xs font-medium text-gray-500 mb-1">Comment</h4>
+                      <p className="text-sm text-gray-600 bg-gray-50 p-3 rounded-lg">
+                        {engagement.comment}
+                      </p>
+                    </div>
+                  )}
+                </div>
+              ))}
             </div>
           ) : (
             <p className="text-gray-500 text-sm">No government engagement data reported</p>
@@ -341,7 +343,7 @@ function UKCityDetail() {
       </div>
 
       {/* Q1.6 - Collaboration */}
-      <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+      <div id="q1_6" className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden scroll-mt-20">
         <div className="bg-orange-50 px-5 py-3 border-b border-orange-100">
           <h3 className="font-semibold text-orange-800 flex items-center">
             <Handshake className="w-4 h-4 mr-2" />

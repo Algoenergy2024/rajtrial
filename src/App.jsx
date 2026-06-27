@@ -184,20 +184,30 @@ function AppContent() {
           </div>
         )}
 
-        {/* Q1 Sections (for UK cities) */}
+        {/* Q1 Sections Dropdown (for UK cities) */}
         {isUKCity && !sidebarCollapsed && (
           <div className="mt-6 px-4">
-            <p className="text-xs font-semibold text-gray-400 uppercase mb-2">CDP Q1 Sections</p>
-            <div className="space-y-1">
+            <p className="text-xs font-semibold text-gray-400 uppercase mb-2">Jump to Section</p>
+            <select
+              onChange={(e) => {
+                if (e.target.value) {
+                  const element = document.getElementById(e.target.value)
+                  if (element) {
+                    element.scrollIntoView({ behavior: 'smooth', block: 'start' })
+                  }
+                  e.target.value = ''
+                }
+              }}
+              className="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white"
+              defaultValue=""
+            >
+              <option value="" disabled>Select Q1 section...</option>
               {q1Sections.map(section => (
-                <div
-                  key={section.code}
-                  className="px-3 py-1.5 text-xs text-gray-600 rounded-lg hover:bg-indigo-50 hover:text-indigo-700"
-                >
+                <option key={section.code} value={section.code}>
                   {section.name}
-                </div>
+                </option>
               ))}
-            </div>
+            </select>
           </div>
         )}
 
