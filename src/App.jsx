@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { Routes, Route, NavLink, useLocation } from 'react-router-dom'
+import { Routes, Route, NavLink, useLocation, useNavigate } from 'react-router-dom'
 import {
   LayoutDashboard,
   Leaf,
@@ -165,6 +165,7 @@ function AppContent() {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const location = useLocation()
+  const navigate = useNavigate()
   const { category, setCategory, isCity, isUKCity, isEuropeanCity } = useOrganization()
 
   const navigation = isUKCity
@@ -172,6 +173,22 @@ function AppContent() {
     : isEuropeanCity
       ? citiesNavigation
       : financialNavigation
+
+  // Handle category change with automatic navigation to dashboard
+  const handleCategoryChange = (newCategory) => {
+    setCategory(newCategory)
+    // Navigate to the appropriate dashboard for each category
+    switch (newCategory) {
+      case CATEGORIES.UK_CITIES:
+        navigate('/uk-dashboard')
+        break
+      case CATEGORIES.EUROPEAN_CITIES:
+        navigate('/city')
+        break
+      default:
+        navigate('/')
+    }
+  }
 
   return (
     <div className="min-h-screen bg-gray-100">
@@ -361,7 +378,7 @@ function AppContent() {
                 return (
                   <button
                     key={tab.key}
-                    onClick={() => setCategory(tab.key)}
+                    onClick={() => handleCategoryChange(tab.key)}
                     className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-all border ${
                       isActive ? colorClasses[tab.color] : `border-transparent ${colorClasses[tab.color]}`
                     }`}
