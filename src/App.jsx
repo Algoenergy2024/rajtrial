@@ -57,10 +57,15 @@ import UKQ8Detail from './pages/UKQ8Detail'
 import UKQ9Detail from './pages/UKQ9Detail'
 import UKQ11Detail from './pages/UKQ11Detail'
 import LandingDashboard from './pages/LandingDashboard'
+import BanksDashboard from './pages/BanksDashboard'
+import InsuranceDashboard from './pages/InsuranceDashboard'
+import EUCitiesDashboard from './pages/EUCitiesDashboard'
+import UKCitiesOverview from './pages/UKCitiesOverview'
 
-// Navigation for financial entities
-const financialNavigation = [
-  { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
+// Navigation for Belgian Banks
+const banksNavigation = [
+  { name: 'Overview', href: '/banks', icon: LayoutDashboard },
+  { name: 'Entity Detail', href: '/dashboard', icon: Building2 },
   { name: 'Sector Comparison', href: '/comparison', icon: TrendingUp },
   { name: 'Climate Action', href: '/climate', icon: Leaf },
   { name: 'Social Impact', href: '/social', icon: Users },
@@ -71,16 +76,30 @@ const financialNavigation = [
   { name: 'Data Entry', href: '/data', icon: Settings },
 ]
 
+// Navigation for Belgian Insurance
+const insuranceNavigation = [
+  { name: 'Overview', href: '/insurance', icon: LayoutDashboard },
+  { name: 'Entity Detail', href: '/dashboard', icon: Shield },
+  { name: 'Sector Comparison', href: '/comparison', icon: TrendingUp },
+  { name: 'Climate Action', href: '/climate', icon: Leaf },
+  { name: 'Social Impact', href: '/social', icon: Users },
+  { name: 'Governance', href: '/governance', icon: Shield },
+  { name: 'Risk Management', href: '/risk', icon: AlertTriangle },
+  { name: 'CSRD Compliance', href: '/csrd', icon: FileText },
+]
+
 // Navigation for European cities
 const citiesNavigation = [
-  { name: 'City Overview', href: '/city', icon: MapPin },
+  { name: 'Overview', href: '/eu-cities', icon: LayoutDashboard },
+  { name: 'City Detail', href: '/city', icon: MapPin },
   { name: 'All Cities', href: '/cities', icon: Globe },
   { name: 'Comparison', href: '/comparison', icon: TrendingUp },
 ]
 
 // Navigation for UK cities (full CDP data)
 const ukCitiesNavigation = [
-  { name: 'Dashboard', href: '/uk-dashboard', icon: LayoutDashboard },
+  { name: 'Overview', href: '/uk-cities', icon: LayoutDashboard },
+  { name: 'Entity Dashboard', href: '/uk-dashboard', icon: MapPin },
   { name: 'Q1 Profile', href: '/uk-city', icon: FileText },
   { name: 'Q2 Hazards', href: '/uk-q2', icon: CloudRain },
   { name: 'Q3 Emissions', href: '/uk-q3', icon: Factory },
@@ -173,21 +192,27 @@ function AppContent() {
     ? ukCitiesNavigation
     : isEuropeanCity
       ? citiesNavigation
-      : financialNavigation
+      : category === CATEGORIES.BELGIAN_INSURANCE
+        ? insuranceNavigation
+        : banksNavigation
 
-  // Handle category change with automatic navigation to dashboard
+  // Handle category change with automatic navigation to category dashboard
   const handleCategoryChange = (newCategory) => {
     setCategory(newCategory)
-    // Navigate to the appropriate dashboard for each category
+    // Navigate to the appropriate category dashboard
     switch (newCategory) {
       case CATEGORIES.UK_CITIES:
-        navigate('/uk-dashboard')
+        navigate('/uk-cities')
         break
       case CATEGORIES.EUROPEAN_CITIES:
-        navigate('/city')
+        navigate('/eu-cities')
         break
+      case CATEGORIES.BELGIAN_INSURANCE:
+        navigate('/insurance')
+        break
+      case CATEGORIES.BELGIAN_BANKS:
       default:
-        navigate('/dashboard')
+        navigate('/banks')
     }
   }
 
@@ -401,6 +426,10 @@ function AppContent() {
         <div className="p-6">
           <Routes>
             <Route path="/" element={<LandingDashboard />} />
+            <Route path="/banks" element={<BanksDashboard />} />
+            <Route path="/insurance" element={<InsuranceDashboard />} />
+            <Route path="/eu-cities" element={<EUCitiesDashboard />} />
+            <Route path="/uk-cities" element={<UKCitiesOverview />} />
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/city" element={<CityDetail />} />
             <Route path="/uk-dashboard" element={<UKCityDashboard />} />
