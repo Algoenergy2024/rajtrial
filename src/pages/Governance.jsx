@@ -6,9 +6,19 @@ import {
 import { useOrganization } from '../context/OrganizationContext'
 
 function Governance() {
-  const { selectedOrg } = useOrganization()
+  const { selectedEntity: selectedOrg, isCity } = useOrganization()
 
-  const hasGovernanceData = selectedOrg.scores?.governance !== null
+  if (isCity || !selectedOrg) {
+    return (
+      <div className="text-center py-12">
+        <Info className="w-16 h-16 text-gray-300 mx-auto mb-4" />
+        <h3 className="text-lg font-medium text-gray-600">Select a financial entity</h3>
+        <p className="text-gray-500">Switch to Belgian Banks or Insurance to view governance data</p>
+      </div>
+    )
+  }
+
+  const hasGovernanceData = selectedOrg?.scores?.governance !== null
 
   // Build governance structure from available data
   const governanceStructure = [
