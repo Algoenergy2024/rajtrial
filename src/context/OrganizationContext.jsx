@@ -1,7 +1,19 @@
 import React, { createContext, useContext, useState } from 'react'
 import { entities, getEntityById, entityTypes } from '../data/belgianEntities'
-import { europeanCities, getCityById, europeanCountries } from '../data/europeanCities'
-import { ukCitiesFull as ukCities, getUKCityById } from '../data/ukCitiesFull'
+import { europeanCities as allEuropeanCities, getCityById, europeanCountries as allEuropeanCountries } from '../data/europeanCities'
+import { ukCitiesFull as allUKCities, getUKCityById } from '../data/ukCitiesFull'
+
+// Sort UK cities alphabetically
+const ukCities = [...allUKCities].sort((a, b) => a.name.localeCompare(b.name))
+
+// Filter out UK from European cities and sort alphabetically
+const europeanCities = allEuropeanCities
+  .filter(c => c.country !== 'United Kingdom')
+  .sort((a, b) => a.name.localeCompare(b.name))
+
+const europeanCountries = allEuropeanCountries
+  .filter(c => c !== 'United Kingdom')
+  .sort((a, b) => a.localeCompare(b))
 
 export const CATEGORIES = {
   BELGIAN_BANKS: 'belgian_banks',
