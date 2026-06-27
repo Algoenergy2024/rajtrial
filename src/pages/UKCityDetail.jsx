@@ -31,7 +31,8 @@ function UKCityDetail() {
   }
 
   const city = selectedEntity
-  const q1_2 = city.q1_2 || {}
+  // Support both old (q1_2) and new (profile) data structures
+  const q1_2 = city.q1_2 || city.profile || {}
   const q1_3 = city.q1_3 || {}
   const q1_4 = city.q1_4 || {}
   const q1_5 = city.q1_5 || []
