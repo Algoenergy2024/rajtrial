@@ -13,18 +13,33 @@ function UKCitiesOverview() {
 
   const cities = ukCitiesFull
 
-  // Helper to calculate emissions from q3_1_3 data
+  // Helper to calculate emissions from q3_1_3 data or emissions.scopes
   const getCityEmissions = (city) => {
-    const sectors = city.q3_1_3 || []
     let scope1 = 0, scope2 = 0, scope3 = 0
-    sectors.forEach(sector => {
-      const s1 = parseFloat(sector['Direct emissions (metric tonnes CO2e)^']) || 0
-      const s2 = parseFloat(sector['Indirect emissions from the use of grid-supplied electricity, heat, steam and/or cooling (metric tonnes CO2e)^']) || 0
-      const s3 = parseFloat(sector['Emissions occurring outside the jurisdiction boundary as a result of in-jurisdiction activities (metric tonnes CO2e)']) || 0
-      scope1 += s1
-      scope2 += s2
-      scope3 += s3
-    })
+
+    // First try q3_1_3 sector data (detailed breakdown)
+    const sectors = city.q3_1_3 || []
+    if (sectors.length > 0) {
+      sectors.forEach(sector => {
+        scope1 += parseFloat(sector['Direct emissions (metric tonnes CO2e)^']) || 0
+        scope2 += parseFloat(sector['Indirect emissions from the use of grid-supplied electricity, heat, steam and/or cooling (metric tonnes CO2e)^']) || 0
+        scope3 += parseFloat(sector['Emissions occurring outside the jurisdiction boundary as a result of in-jurisdiction activities (metric tonnes CO2e)']) || 0
+      })
+    }
+    // Fall back to emissions.scopes array
+    else if (city.emissions?.scopes) {
+      city.emissions.scopes.forEach(s => {
+        const val = parseFloat(s.emissions) || 0
+        if (s.scope?.toLowerCase().includes('scope 1')) {
+          scope1 += val
+        } else if (s.scope?.toLowerCase().includes('scope 2')) {
+          scope2 += val
+        } else if (s.scope?.toLowerCase().includes('scope 3')) {
+          scope3 += val
+        }
+      })
+    }
+
     return { scope1, scope2, scope3, total: scope1 + scope2 + scope3 }
   }
 
@@ -39,7 +54,7 @@ function UKCitiesOverview() {
     }
   }, { scope1: 0, scope2: 0, scope3: 0, total: 0 })
 
-  const citiesWithEmissions = cities.filter(c => (c.q3_1_3?.length || 0) > 0).length
+  const citiesWithEmissions = cities.filter(c => (c.q3_1_3?.length || 0) > 0 || c.emissions?.scopes?.length > 0).length
 
   const stats = {
     count: cities.length,
