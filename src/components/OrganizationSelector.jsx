@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { ChevronDown, Building2, Shield, Globe, Check, MapPin } from 'lucide-react'
+import { ChevronDown, Building2, Shield, Globe, Check, MapPin, Flag } from 'lucide-react'
 import { useOrganization, CATEGORIES } from '../context/OrganizationContext'
 
 const CATEGORY_INFO = {
@@ -17,6 +17,11 @@ const CATEGORY_INFO = {
     label: 'European Cities',
     icon: Globe,
     color: 'green'
+  },
+  [CATEGORIES.UK_CITIES]: {
+    label: 'UK Cities (Q1)',
+    icon: Flag,
+    color: 'indigo'
   }
 }
 
@@ -28,6 +33,7 @@ function OrganizationSelector() {
     setSelectedId,
     currentEntities,
     isCity,
+    isEuropeanCity,
     europeanCountries,
     selectedCountry,
     setSelectedCountry
@@ -43,20 +49,27 @@ function OrganizationSelector() {
     const colors = {
       blue: { bg: 'bg-blue-100', text: 'text-blue-600', hover: 'hover:bg-blue-50', selected: 'bg-blue-50 text-blue-700' },
       purple: { bg: 'bg-purple-100', text: 'text-purple-600', hover: 'hover:bg-purple-50', selected: 'bg-purple-50 text-purple-700' },
-      green: { bg: 'bg-green-100', text: 'text-green-600', hover: 'hover:bg-green-50', selected: 'bg-green-50 text-green-700' }
+      green: { bg: 'bg-green-100', text: 'text-green-600', hover: 'hover:bg-green-50', selected: 'bg-green-50 text-green-700' },
+      indigo: { bg: 'bg-indigo-100', text: 'text-indigo-600', hover: 'hover:bg-indigo-50', selected: 'bg-indigo-50 text-indigo-700' }
     }
-    return colors[color][variant]
+    return colors[color]?.[variant] || colors.blue[variant]
   }
 
   const getEntityLabel = (entity) => {
     if (isCity) {
-      return `${entity.country} • Pop: ${entity.population?.toLocaleString() || 'N/A'}`
+      // UK cities have q1_2 data structure
+      const pop = entity.q1_2?.population || entity.population
+      return `${entity.country} • Pop: ${pop?.toLocaleString() || 'N/A'}`
     }
     return `${entity.type === 'bank' ? 'Bank' : 'Insurance'} • ${entity.headquarters || 'Belgium'}`
   }
 
   const getEntityScore = (entity) => {
     if (isCity) {
+      // UK cities show org type, European cities show emissions
+      if (entity.q1_2) {
+        return entity.orgType || 'CDP Q1 Data'
+      }
       return entity.emissions?.total ? `${(entity.emissions.total / 1000000).toFixed(1)}M tCO2` : 'CDP Data'
     }
     return entity.esgScore ? `ESG: ${entity.esgScore}/10` : 'Data pending'
@@ -103,8 +116,8 @@ function OrganizationSelector() {
         )}
       </div>
 
-      {/* Country Filter for Cities */}
-      {isCity && (
+      {/* Country Filter for European Cities only */}
+      {isEuropeanCity && (
         <select
           value={selectedCountry}
           onChange={(e) => setSelectedCountry(e.target.value)}

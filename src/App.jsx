@@ -15,7 +15,8 @@ import {
   AlertTriangle,
   Menu,
   Globe,
-  MapPin
+  MapPin,
+  Flag
 } from 'lucide-react'
 
 import { OrganizationProvider, useOrganization, CATEGORIES } from './context/OrganizationContext'
@@ -31,6 +32,7 @@ import DataEntry from './pages/DataEntry'
 import Comparison from './pages/Comparison'
 import Cities from './pages/Cities'
 import CityDetail from './pages/CityDetail'
+import UKCityDetail from './pages/UKCityDetail'
 
 // Navigation for financial entities
 const financialNavigation = [
@@ -45,11 +47,17 @@ const financialNavigation = [
   { name: 'Data Entry', href: '/data', icon: Settings },
 ]
 
-// Navigation for cities
+// Navigation for European cities
 const citiesNavigation = [
   { name: 'City Overview', href: '/city', icon: MapPin },
   { name: 'All Cities', href: '/cities', icon: Globe },
   { name: 'Comparison', href: '/comparison', icon: TrendingUp },
+]
+
+// Navigation for UK cities (Q1 detailed data)
+const ukCitiesNavigation = [
+  { name: 'City Detail (Q1)', href: '/uk-city', icon: Flag },
+  { name: 'All UK Entities', href: '/cities', icon: Globe },
 ]
 
 // CDP Regions for cities sidebar
@@ -58,13 +66,27 @@ const cdpRegions = [
   { name: 'UK & Western', code: 'UKWW', count: 59 },
 ]
 
+// Q1 Sections for UK cities sidebar
+const q1Sections = [
+  { name: 'Q1.1 - Language', code: 'q1_1' },
+  { name: 'Q1.2 - Jurisdiction', code: 'q1_2' },
+  { name: 'Q1.3 - Oversight', code: 'q1_3' },
+  { name: 'Q1.4 - Opportunities', code: 'q1_4' },
+  { name: 'Q1.5 - Engagement', code: 'q1_5' },
+  { name: 'Q1.6 - Collaboration', code: 'q1_6' },
+]
+
 function AppContent() {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const location = useLocation()
-  const { category, isCity } = useOrganization()
+  const { category, isCity, isUKCity, isEuropeanCity } = useOrganization()
 
-  const navigation = isCity ? citiesNavigation : financialNavigation
+  const navigation = isUKCity
+    ? ukCitiesNavigation
+    : isEuropeanCity
+      ? citiesNavigation
+      : financialNavigation
 
   return (
     <div className="min-h-screen bg-gray-100">
@@ -105,11 +127,13 @@ function AppContent() {
         {!sidebarCollapsed && (
           <div className="px-4 py-3 border-b border-gray-100">
             <div className={`px-3 py-2 rounded-lg text-sm font-medium ${
-              isCity ? 'bg-green-50 text-green-700' : 'bg-blue-50 text-blue-700'
+              isUKCity ? 'bg-indigo-50 text-indigo-700' :
+              isEuropeanCity ? 'bg-green-50 text-green-700' : 'bg-blue-50 text-blue-700'
             }`}>
               {category === CATEGORIES.BELGIAN_BANKS && '🏦 Belgian Banks'}
               {category === CATEGORIES.BELGIAN_INSURANCE && '🛡️ Belgian Insurance'}
               {category === CATEGORIES.EUROPEAN_CITIES && '🏙️ European Cities'}
+              {category === CATEGORIES.UK_CITIES && '🇬🇧 UK Cities (Q1)'}
             </div>
           </div>
         )}
@@ -142,8 +166,8 @@ function AppContent() {
           </ul>
         </nav>
 
-        {/* CDP Regions (for cities) */}
-        {isCity && !sidebarCollapsed && (
+        {/* CDP Regions (for European cities) */}
+        {isEuropeanCity && !sidebarCollapsed && (
           <div className="mt-6 px-4">
             <p className="text-xs font-semibold text-gray-400 uppercase mb-2">CDP Regions</p>
             <div className="space-y-1">
@@ -154,6 +178,23 @@ function AppContent() {
                 >
                   <span>{region.name}</span>
                   <span className="text-xs bg-gray-100 px-2 py-0.5 rounded-full">{region.count}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Q1 Sections (for UK cities) */}
+        {isUKCity && !sidebarCollapsed && (
+          <div className="mt-6 px-4">
+            <p className="text-xs font-semibold text-gray-400 uppercase mb-2">CDP Q1 Sections</p>
+            <div className="space-y-1">
+              {q1Sections.map(section => (
+                <div
+                  key={section.code}
+                  className="px-3 py-1.5 text-xs text-gray-600 rounded-lg hover:bg-indigo-50 hover:text-indigo-700"
+                >
+                  {section.name}
                 </div>
               ))}
             </div>
@@ -209,6 +250,7 @@ function AppContent() {
           <Routes>
             <Route path="/" element={<Dashboard />} />
             <Route path="/city" element={<CityDetail />} />
+            <Route path="/uk-city" element={<UKCityDetail />} />
             <Route path="/cities" element={<Cities />} />
             <Route path="/climate" element={<ClimateAction />} />
             <Route path="/social" element={<SocialImpact />} />
