@@ -16,7 +16,12 @@ import {
   Menu,
   Globe,
   MapPin,
-  Flag
+  Flag,
+  CloudRain,
+  Factory,
+  Zap,
+  Target,
+  ClipboardList
 } from 'lucide-react'
 
 import { OrganizationProvider, useOrganization, CATEGORIES } from './context/OrganizationContext'
@@ -34,6 +39,15 @@ import Cities from './pages/Cities'
 import CityDetail from './pages/CityDetail'
 import UKCityDetail from './pages/UKCityDetail'
 import UKCityDashboard from './pages/UKCityDashboard'
+import UKQ2Detail from './pages/UKQ2Detail'
+import UKQ3Detail from './pages/UKQ3Detail'
+import UKQ4Detail from './pages/UKQ4Detail'
+import UKQ5Detail from './pages/UKQ5Detail'
+import UKQ6Detail from './pages/UKQ6Detail'
+import UKQ7Detail from './pages/UKQ7Detail'
+import UKQ8Detail from './pages/UKQ8Detail'
+import UKQ9Detail from './pages/UKQ9Detail'
+import UKQ11Detail from './pages/UKQ11Detail'
 
 // Navigation for financial entities
 const financialNavigation = [
@@ -58,7 +72,16 @@ const citiesNavigation = [
 // Navigation for UK cities (full CDP data)
 const ukCitiesNavigation = [
   { name: 'Dashboard', href: '/uk-dashboard', icon: LayoutDashboard },
-  { name: 'Full Q1 Detail', href: '/uk-city', icon: FileText },
+  { name: 'Q1 Profile', href: '/uk-city', icon: FileText },
+  { name: 'Q2 Hazards', href: '/uk-q2', icon: CloudRain },
+  { name: 'Q3 Emissions', href: '/uk-q3', icon: Factory },
+  { name: 'Q4 Energy', href: '/uk-q4', icon: Zap },
+  { name: 'Q5 Adaptation', href: '/uk-q5', icon: Shield },
+  { name: 'Q6 Targets', href: '/uk-q6', icon: Target },
+  { name: 'Q7 Other', href: '/uk-q7', icon: Target },
+  { name: 'Q8 Plans', href: '/uk-q8', icon: ClipboardList },
+  { name: 'Q9 Actions', href: '/uk-q9', icon: Zap },
+  { name: 'Q11 Additional', href: '/uk-q11', icon: FileText },
   { name: 'All UK Entities', href: '/cities', icon: Globe },
 ]
 
@@ -68,15 +91,67 @@ const cdpRegions = [
   { name: 'UK & Western', code: 'UKWW', count: 59 },
 ]
 
-// Q1 Sections for UK cities sidebar
-const q1Sections = [
-  { name: 'Q1.1 - Language', code: 'q1_1' },
-  { name: 'Q1.2 - Jurisdiction', code: 'q1_2' },
-  { name: 'Q1.3 - Oversight', code: 'q1_3' },
-  { name: 'Q1.4 - Opportunities', code: 'q1_4' },
-  { name: 'Q1.5 - Engagement', code: 'q1_5' },
-  { name: 'Q1.6 - Collaboration', code: 'q1_6' },
-]
+// Section navigation for each UK city question page
+const ukSectionsByPage = {
+  '/uk-city': [
+    { name: 'Q1.2 - Jurisdiction', code: 'q1_2' },
+    { name: 'Q1.3 - Oversight', code: 'q1_3' },
+    { name: 'Q1.4 - Opportunities', code: 'q1_4' },
+    { name: 'Q1.5 - Engagement', code: 'q1_5' },
+    { name: 'Q1.6 - Collaboration', code: 'q1_6' },
+  ],
+  '/uk-q2': [
+    { name: 'Q2.1 - Assessment Status', code: 'q2_1' },
+    { name: 'Q2.1.1 - Assessments', code: 'q2_1_1' },
+    { name: 'Q2.2 - Climate Hazards', code: 'q2_2' },
+    { name: 'Q2.3 - Adaptive Capacity', code: 'q2_3' },
+  ],
+  '/uk-q3': [
+    { name: 'Q3.1 - Inventory Status', code: 'q3_1' },
+    { name: 'Q3.1.1 - Documents', code: 'q3_1_1' },
+    { name: 'Q3.1.3 - Sector Emissions', code: 'q3_1_3' },
+    { name: 'Q3.2 - Consumption Based', code: 'q3_2' },
+    { name: 'Q3.3 - Tracking', code: 'q3_3' },
+  ],
+  '/uk-q4': [
+    { name: 'Q4.1 - Energy Assessment', code: 'q4_1' },
+    { name: 'Q4.3 - Energy Poverty', code: 'q4_3' },
+    { name: 'Q4.5 - Transport', code: 'q4_5' },
+    { name: 'Q4.7 - Waste', code: 'q4_7' },
+    { name: 'Q4.8 - Health', code: 'q4_8' },
+    { name: 'Q4.9 - Air Quality', code: 'q4_9' },
+    { name: 'Q4.10 - Water', code: 'q4_10' },
+  ],
+  '/uk-q5': [
+    { name: 'Q5.1 - Status', code: 'q5_1' },
+    { name: 'Q5.1.1 - Goals', code: 'q5_1_1' },
+  ],
+  '/uk-q6': [
+    { name: 'Q6.1 - Overview', code: 'q6_1' },
+    { name: 'Q6.1.1 - Targets', code: 'q6_1_1' },
+    { name: 'Q6.1.2 - Carbon Credits', code: 'q6_1_2' },
+  ],
+  '/uk-q7': [
+    { name: 'Q7.1 - Other Targets', code: 'q7_1' },
+  ],
+  '/uk-q8': [
+    { name: 'Q8.1 - Status', code: 'q8_1' },
+    { name: 'Q8.1.1 - Climate Plans', code: 'q8_1_1' },
+    { name: 'Q8.2 - Other Plans', code: 'q8_2' },
+    { name: 'Q8.3 - Characteristics', code: 'q8_3' },
+    { name: 'Q8.4 - Procurement', code: 'q8_4' },
+  ],
+  '/uk-q9': [
+    { name: 'Q9.1 - Adaptation Actions', code: 'q9_1' },
+    { name: 'Q9.2 - Mitigation Actions', code: 'q9_2' },
+    { name: 'Q9.3 - Projects', code: 'q9_3' },
+    { name: 'Q9.4 - Finance', code: 'q9_4' },
+  ],
+  '/uk-q11': [
+    { name: 'Q11.1 - Documents', code: 'q11_1' },
+    { name: 'Q11.2 - Comments', code: 'q11_2' },
+  ],
+}
 
 function AppContent() {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
@@ -186,8 +261,8 @@ function AppContent() {
           </div>
         )}
 
-        {/* Q1 Sections Dropdown (for UK cities) */}
-        {isUKCity && !sidebarCollapsed && (
+        {/* Section Dropdown (for UK cities) */}
+        {isUKCity && !sidebarCollapsed && ukSectionsByPage[location.pathname] && (
           <div className="mt-6 px-4">
             <p className="text-xs font-semibold text-gray-400 uppercase mb-2">Jump to Section</p>
             <select
@@ -203,8 +278,8 @@ function AppContent() {
               className="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white"
               defaultValue=""
             >
-              <option value="" disabled>Select Q1 section...</option>
-              {q1Sections.map(section => (
+              <option value="" disabled>Select section...</option>
+              {ukSectionsByPage[location.pathname].map(section => (
                 <option key={section.code} value={section.code}>
                   {section.name}
                 </option>
@@ -264,6 +339,15 @@ function AppContent() {
             <Route path="/city" element={<CityDetail />} />
             <Route path="/uk-dashboard" element={<UKCityDashboard />} />
             <Route path="/uk-city" element={<UKCityDetail />} />
+            <Route path="/uk-q2" element={<UKQ2Detail />} />
+            <Route path="/uk-q3" element={<UKQ3Detail />} />
+            <Route path="/uk-q4" element={<UKQ4Detail />} />
+            <Route path="/uk-q5" element={<UKQ5Detail />} />
+            <Route path="/uk-q6" element={<UKQ6Detail />} />
+            <Route path="/uk-q7" element={<UKQ7Detail />} />
+            <Route path="/uk-q8" element={<UKQ8Detail />} />
+            <Route path="/uk-q9" element={<UKQ9Detail />} />
+            <Route path="/uk-q11" element={<UKQ11Detail />} />
             <Route path="/cities" element={<Cities />} />
             <Route path="/climate" element={<ClimateAction />} />
             <Route path="/social" element={<SocialImpact />} />
