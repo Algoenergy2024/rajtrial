@@ -25,7 +25,15 @@ import {
 } from 'lucide-react'
 
 import { OrganizationProvider, useOrganization, CATEGORIES } from './context/OrganizationContext'
-import OrganizationSelector from './components/OrganizationSelector'
+import EntitySelector from './components/EntitySelector'
+
+// Category tabs configuration
+const CATEGORY_TABS = [
+  { key: CATEGORIES.BELGIAN_BANKS, label: 'Banks', shortLabel: 'Banks', icon: Building2, color: 'blue' },
+  { key: CATEGORIES.BELGIAN_INSURANCE, label: 'Insurance', shortLabel: 'Ins.', icon: Shield, color: 'purple' },
+  { key: CATEGORIES.EUROPEAN_CITIES, label: 'EU Cities', shortLabel: 'EU', icon: Globe, color: 'green' },
+  { key: CATEGORIES.UK_CITIES, label: 'UK Cities', shortLabel: 'UK', icon: Flag, color: 'indigo' },
+]
 import Dashboard from './pages/Dashboard'
 import ClimateAction from './pages/ClimateAction'
 import SocialImpact from './pages/SocialImpact'
@@ -157,7 +165,7 @@ function AppContent() {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const location = useLocation()
-  const { category, isCity, isUKCity, isEuropeanCity } = useOrganization()
+  const { category, setCategory, isCity, isUKCity, isEuropeanCity } = useOrganization()
 
   const navigation = isUKCity
     ? ukCitiesNavigation
@@ -314,21 +322,60 @@ function AppContent() {
         transition-all duration-300 min-h-screen
         ${sidebarCollapsed ? 'lg:ml-20' : 'lg:ml-64'}
       `}>
-        {/* Header */}
+        {/* Header - Split Design */}
         <header className="bg-white shadow-sm border-b border-gray-200 sticky top-0 z-20">
-          <div className="flex items-center justify-between px-6 py-3">
-            <div className="flex items-center space-x-4 ml-12 lg:ml-0">
-              <OrganizationSelector />
-            </div>
-            <div className="flex items-center space-x-4">
-              <span className="px-2 py-1 text-xs font-medium bg-green-100 text-green-700 rounded-full">
-                CDP 2025
-              </span>
-              <div className="flex items-center space-x-2">
-                <span className="w-2 h-2 bg-green-500 rounded-full pulse-indicator"></span>
-                <span className="text-sm text-gray-500">Live</span>
+          {/* Top Bar - Branding & Global */}
+          <div className="flex items-center justify-between px-4 py-2 border-b border-gray-100">
+            <div className="flex items-center gap-3 ml-10 lg:ml-0">
+              <div className="hidden lg:flex items-center gap-2">
+                <div className="w-7 h-7 bg-gradient-to-br from-green-500 to-blue-600 rounded-lg flex items-center justify-center">
+                  <Leaf className="w-4 h-4 text-white" />
+                </div>
+                <span className="font-bold text-gray-800 text-sm">ESG Platform</span>
               </div>
             </div>
+            <div className="flex items-center gap-3">
+              <span className="px-2.5 py-1 text-xs font-semibold bg-green-100 text-green-700 rounded-full">
+                CDP 2025
+              </span>
+              <div className="flex items-center gap-1.5">
+                <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
+                <span className="text-xs text-gray-500">Live</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Second Bar - Category Tabs & Entity Selector */}
+          <div className="flex items-center justify-between px-4 py-2">
+            {/* Category Tabs */}
+            <div className="flex items-center gap-1 ml-10 lg:ml-0">
+              {CATEGORY_TABS.map((tab) => {
+                const Icon = tab.icon
+                const isActive = category === tab.key
+                const colorClasses = {
+                  blue: isActive ? 'bg-blue-100 text-blue-700 border-blue-200' : 'hover:bg-blue-50 text-gray-600',
+                  purple: isActive ? 'bg-purple-100 text-purple-700 border-purple-200' : 'hover:bg-purple-50 text-gray-600',
+                  green: isActive ? 'bg-green-100 text-green-700 border-green-200' : 'hover:bg-green-50 text-gray-600',
+                  indigo: isActive ? 'bg-indigo-100 text-indigo-700 border-indigo-200' : 'hover:bg-indigo-50 text-gray-600',
+                }
+                return (
+                  <button
+                    key={tab.key}
+                    onClick={() => setCategory(tab.key)}
+                    className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-all border ${
+                      isActive ? colorClasses[tab.color] : `border-transparent ${colorClasses[tab.color]}`
+                    }`}
+                  >
+                    <Icon className="w-4 h-4" />
+                    <span className="hidden sm:inline">{tab.label}</span>
+                    <span className="sm:hidden">{tab.shortLabel}</span>
+                  </button>
+                )
+              })}
+            </div>
+
+            {/* Entity Selector */}
+            <EntitySelector />
           </div>
         </header>
 
