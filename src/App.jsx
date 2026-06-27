@@ -65,6 +65,9 @@ import EUCitiesDashboard from './pages/EUCitiesDashboard'
 import UKCitiesOverview from './pages/UKCitiesOverview'
 import UKCityComparison from './pages/UKCityComparison'
 import UKAIAutomation from './pages/UKAIAutomation'
+import EUCityDashboard from './pages/EUCityDashboard'
+import EUCityComparison from './pages/EUCityComparison'
+import EUAIAutomation from './pages/EUAIAutomation'
 
 // Navigation for Belgian Banks
 const banksNavigation = [
@@ -92,12 +95,27 @@ const insuranceNavigation = [
   { name: 'CSRD Compliance', href: '/csrd', icon: FileText },
 ]
 
-// Navigation for European cities
+// Navigation for European cities (full CDP data)
 const citiesNavigation = [
   { name: 'Overview', href: '/eu-cities', icon: LayoutDashboard },
-  { name: 'City Detail', href: '/city', icon: MapPin },
-  { name: 'All Cities', href: '/cities', icon: Globe },
-  { name: 'Comparison', href: '/comparison', icon: TrendingUp },
+  { name: 'Entity Dashboard', href: '/eu-dashboard', icon: MapPin },
+  { name: 'CDP Questions', href: null, icon: FileText, isDropdown: true, dropdownType: 'eu' },
+  { name: 'City Comparison', href: '/eu-comparison', icon: TrendingUp },
+  { name: 'AI & Automation', href: '/eu-ai', icon: Brain },
+]
+
+// CDP Question pages for EU Cities dropdown
+const euCDPQuestions = [
+  { name: 'Q1 Profile', href: '/eu-q1', icon: FileText },
+  { name: 'Q2 Hazards', href: '/eu-q2', icon: CloudRain },
+  { name: 'Q3 Emissions', href: '/eu-q3', icon: Factory },
+  { name: 'Q4 Energy', href: '/eu-q4', icon: Zap },
+  { name: 'Q5 Adaptation', href: '/eu-q5', icon: Shield },
+  { name: 'Q6 Targets', href: '/eu-q6', icon: Target },
+  { name: 'Q7 Other', href: '/eu-q7', icon: Target },
+  { name: 'Q8 Plans', href: '/eu-q8', icon: ClipboardList },
+  { name: 'Q9 Actions', href: '/eu-q9', icon: Zap },
+  { name: 'Q11 Additional', href: '/eu-q11', icon: FileText },
 ]
 
 // Navigation for UK cities (full CDP data)
@@ -200,7 +218,9 @@ function AppContent() {
   const { category, setCategory, isCity, isUKCity, isEuropeanCity } = useOrganization()
 
   // Check if current page is a CDP question page
-  const isOnCDPPage = ukCDPQuestions.some(q => q.href === location.pathname)
+  const isOnUKCDPPage = ukCDPQuestions.some(q => q.href === location.pathname)
+  const isOnEUCDPPage = euCDPQuestions.some(q => q.href === location.pathname)
+  const isOnCDPPage = isOnUKCDPPage || isOnEUCDPPage
 
   const navigation = isUKCity
     ? ukCitiesNavigation
@@ -287,8 +307,10 @@ function AppContent() {
               const Icon = item.icon
               const isActive = item.href ? location.pathname === item.href : isOnCDPPage
 
-              // Handle dropdown items (CDP Questions)
-              if (item.isDropdown && isUKCity) {
+              // Handle dropdown items (CDP Questions for UK or EU)
+              if (item.isDropdown && (isUKCity || isEuropeanCity)) {
+                const questions = item.dropdownType === 'eu' ? euCDPQuestions : ukCDPQuestions
+                const activeColor = isEuropeanCity ? 'bg-green-100 text-green-700' : 'bg-indigo-100 text-indigo-700'
                 return (
                   <li key={item.name}>
                     <button
@@ -312,7 +334,7 @@ function AppContent() {
                     {/* Dropdown content */}
                     {cdpDropdownOpen && !sidebarCollapsed && (
                       <ul className="mt-1 ml-4 space-y-1 border-l-2 border-gray-200 pl-3">
-                        {ukCDPQuestions.map((q) => {
+                        {questions.map((q) => {
                           const QIcon = q.icon
                           const qActive = location.pathname === q.href
                           return (
@@ -323,7 +345,7 @@ function AppContent() {
                                 className={`
                                   flex items-center px-3 py-2 rounded-lg text-sm transition-all duration-200
                                   ${qActive
-                                    ? 'bg-indigo-100 text-indigo-700 font-medium'
+                                    ? activeColor + ' font-medium'
                                     : 'text-gray-600 hover:bg-gray-100'
                                   }
                                 `}
@@ -520,6 +542,19 @@ function AppContent() {
             <Route path="/uk-q11" element={<UKQ11Detail />} />
             <Route path="/uk-comparison" element={<UKCityComparison />} />
             <Route path="/uk-ai" element={<UKAIAutomation />} />
+            <Route path="/eu-dashboard" element={<EUCityDashboard />} />
+            <Route path="/eu-comparison" element={<EUCityComparison />} />
+            <Route path="/eu-ai" element={<EUAIAutomation />} />
+            <Route path="/eu-q1" element={<EUCityDashboard />} />
+            <Route path="/eu-q2" element={<EUCityDashboard />} />
+            <Route path="/eu-q3" element={<EUCityDashboard />} />
+            <Route path="/eu-q4" element={<EUCityDashboard />} />
+            <Route path="/eu-q5" element={<EUCityDashboard />} />
+            <Route path="/eu-q6" element={<EUCityDashboard />} />
+            <Route path="/eu-q7" element={<EUCityDashboard />} />
+            <Route path="/eu-q8" element={<EUCityDashboard />} />
+            <Route path="/eu-q9" element={<EUCityDashboard />} />
+            <Route path="/eu-q11" element={<EUCityDashboard />} />
             <Route path="/cities" element={<Cities />} />
             <Route path="/climate" element={<ClimateAction />} />
             <Route path="/social" element={<SocialImpact />} />

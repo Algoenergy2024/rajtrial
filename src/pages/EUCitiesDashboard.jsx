@@ -4,49 +4,62 @@ import {
   ArrowRight, Info
 } from 'lucide-react'
 import { useOrganization } from '../context/OrganizationContext'
-import { europeanCities, europeanCountries } from '../data/europeanCities'
+import { euCitiesFull, euCountriesFull } from '../data/euCitiesFull'
 
 function EUCitiesDashboard() {
   const { setSelectedId, selectedCountry, setSelectedCountry } = useOrganization()
   const [sortBy, setSortBy] = useState('name')
 
-  // Exclude UK cities (they have their own dedicated section)
-  const euCities = europeanCities.filter(c => c.country !== 'United Kingdom')
-  const euCountries = europeanCountries.filter(c => c !== 'United Kingdom')
+  const euCities = euCitiesFull
+  const euCountries = euCountriesFull
 
   // Filter by country if selected
   const filteredCities = selectedCountry === 'all'
     ? euCities
     : euCities.filter(c => c.country === selectedCountry)
 
+  // Helper to get emissions from q3_1_3 data
+  const getCityEmissions = (city) => {
+    const sectors = city.q3_1_3 || []
+    let scope1 = 0, scope2 = 0, scope3 = 0
+    sectors.forEach(sector => {
+      scope1 += parseFloat(sector['Direct emissions (metric tonnes CO2e)^']) || 0
+      scope2 += parseFloat(sector['Indirect emissions from the use of grid-supplied electricity, heat, steam and/or cooling (metric tonnes CO2e)^']) || 0
+      scope3 += parseFloat(sector['Emissions occurring outside the jurisdiction boundary as a result of in-jurisdiction activities (metric tonnes CO2e)']) || 0
+    })
+    return { scope1, scope2, scope3, total: scope1 + scope2 + scope3 }
+  }
+
   // Calculate emissions totals
   const totalEmissions = filteredCities.reduce((acc, city) => {
-    const e = city.emissions || {}
+    const e = getCityEmissions(city)
     return {
-      scope1: acc.scope1 + (e.scope1 || 0),
-      scope2: acc.scope2 + (e.scope2 || 0),
-      scope3: acc.scope3 + (e.scope3 || 0),
-      total: acc.total + (e.total || 0)
+      scope1: acc.scope1 + e.scope1,
+      scope2: acc.scope2 + e.scope2,
+      scope3: acc.scope3 + e.scope3,
+      total: acc.total + e.total
     }
   }, { scope1: 0, scope2: 0, scope3: 0, total: 0 })
 
-  const citiesWithEmissions = filteredCities.filter(c => c.emissions?.total > 0).length
+  const citiesWithEmissions = filteredCities.filter(c => (c.q3_1_3?.length || 0) > 0).length
+
+  const getPopulation = (city) => city.q1_2?.[0]?.population || city.q1_2?.[0]?.['Population^'] || 0
 
   // Compute aggregates
   const stats = {
     totalCities: euCities.length,
     filteredCount: filteredCities.length,
     countries: euCountries.length,
-    totalPopulation: filteredCities.reduce((sum, c) => sum + (c.population || 0), 0),
+    totalPopulation: filteredCities.reduce((sum, c) => sum + getPopulation(c), 0),
     emissions: totalEmissions,
     citiesWithEmissions,
-    withHazards: filteredCities.filter(c => c.hazards?.length > 0).length,
-    totalHazards: filteredCities.reduce((sum, c) => sum + (c.hazards?.length || 0), 0),
-    withTargets: filteredCities.filter(c => c.target?.year).length,
+    withHazards: filteredCities.filter(c => (c.q2_2?.length || 0) > 0).length,
+    totalHazards: filteredCities.reduce((sum, c) => sum + (c.q2_2?.length || 0), 0),
+    withTargets: filteredCities.filter(c => (c.q6_1_1?.length || 0) > 0).length,
     byCountry: euCountries.map(country => ({
       country,
       count: euCities.filter(c => c.country === country).length,
-      population: euCities.filter(c => c.country === country).reduce((s, c) => s + (c.population || 0), 0)
+      population: euCities.filter(c => c.country === country).reduce((s, c) => s + getPopulation(c), 0)
     })).sort((a, b) => b.count - a.count)
   }
 
@@ -61,11 +74,11 @@ function EUCitiesDashboard() {
   const sortedCities = [...filteredCities].sort((a, b) => {
     switch (sortBy) {
       case 'population':
-        return (b.population || 0) - (a.population || 0)
+        return getPopulation(b) - getPopulation(a)
       case 'name':
         return a.name.localeCompare(b.name)
       case 'hazards':
-        return (b.hazards?.length || 0) - (a.hazards?.length || 0)
+        return (b.q2_2?.length || 0) - (a.q2_2?.length || 0)
       default:
         return 0
     }
@@ -217,17 +230,17 @@ function EUCitiesDashboard() {
               <div className="flex items-center gap-6">
                 <div className="text-right">
                   <p className="text-sm text-gray-500">Population</p>
-                  <p className="font-medium text-gray-800">{formatNumber(city.population)}</p>
+                  <p className="font-medium text-gray-800">{formatNumber(getPopulation(city))}</p>
                 </div>
                 <div className="text-right">
-                  <p className="text-sm text-gray-500">Area</p>
-                  <p className="font-medium text-gray-800">{city.area ? `${city.area.toLocaleString()} km²` : 'N/A'}</p>
+                  <p className="text-sm text-gray-500">Type</p>
+                  <p className="font-medium text-gray-800">{city.orgType || 'City'}</p>
                 </div>
                 <div className="text-right w-24">
-                  {city.hazards?.length > 0 ? (
+                  {(city.q2_2?.length || 0) > 0 ? (
                     <span className="inline-flex items-center gap-1 px-2 py-1 bg-orange-100 text-orange-700 rounded-full text-xs">
                       <AlertTriangle className="w-3 h-3" />
-                      {city.hazards.length} hazards
+                      {city.q2_2.length} hazards
                     </span>
                   ) : (
                     <span className="text-xs text-gray-400">No hazards</span>
