@@ -15,31 +15,36 @@ export function OrganizationProvider({ children }) {
   const [selectedId, setSelectedId] = useState('crelan')
   const [selectedCountry, setSelectedCountry] = useState('all')
 
-  // Get selected entity based on category
-  const getSelectedEntity = () => {
-    if (category === CATEGORIES.EUROPEAN_CITIES) {
-      return getCityById(selectedId) || europeanCities[0]
-    }
-    return getEntityById(selectedId) || entities[0]
-  }
-
   // Get all items for current category
   const getEntitiesForCategory = () => {
     switch (category) {
       case CATEGORIES.BELGIAN_BANKS:
-        return entities.filter(e => e.type === entityTypes.BANK)
+        return entities.filter(e => e?.type === entityTypes.BANK) || []
       case CATEGORIES.BELGIAN_INSURANCE:
-        return entities.filter(e => e.type === entityTypes.INSURANCE)
+        return entities.filter(e => e?.type === entityTypes.INSURANCE) || []
       case CATEGORIES.EUROPEAN_CITIES:
-        if (selectedCountry === 'all') return europeanCities
-        return europeanCities.filter(c => c.country === selectedCountry)
+        if (selectedCountry === 'all') return europeanCities || []
+        return europeanCities.filter(c => c?.country === selectedCountry) || []
       default:
-        return entities
+        return entities || []
     }
   }
 
-  const selectedEntity = getSelectedEntity()
   const currentEntities = getEntitiesForCategory()
+
+  // Get selected entity based on category
+  const getSelectedEntity = () => {
+    if (category === CATEGORIES.EUROPEAN_CITIES) {
+      const city = getCityById(selectedId)
+      if (city) return city
+      return currentEntities[0] || { id: 'default', name: 'No cities available' }
+    }
+    const entity = getEntityById(selectedId)
+    if (entity) return entity
+    return currentEntities[0] || { id: 'default', name: 'No entities available' }
+  }
+
+  const selectedEntity = getSelectedEntity()
 
   // When category changes, select first item in that category
   const changeCategory = (newCategory) => {

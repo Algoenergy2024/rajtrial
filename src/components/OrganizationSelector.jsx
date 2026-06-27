@@ -110,8 +110,8 @@ function OrganizationSelector() {
           onChange={(e) => setSelectedCountry(e.target.value)}
           className="px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
         >
-          <option value="all">All Countries ({currentEntities.length})</option>
-          {europeanCountries.map(country => (
+          <option value="all">All Countries ({currentEntities?.length || 0})</option>
+          {(europeanCountries || []).map(country => (
             <option key={country} value={country}>{country}</option>
           ))}
         </select>
@@ -144,7 +144,7 @@ function OrganizationSelector() {
             <div className="fixed inset-0 z-40" onClick={() => setIsOpen(false)} />
             <div className="absolute top-full left-0 right-0 mt-2 bg-white border border-gray-200 rounded-xl shadow-lg z-50 overflow-hidden max-h-[400px] overflow-y-auto">
               <div className="p-2">
-                {currentEntities.map(entity => (
+                {(currentEntities || []).filter(e => e?.id).map(entity => (
                   <button
                     key={entity.id}
                     onClick={() => {
