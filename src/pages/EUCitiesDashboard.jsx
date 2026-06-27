@@ -6,17 +6,33 @@ import {
 import { useOrganization } from '../context/OrganizationContext'
 import { euCitiesFull, euCountriesFull } from '../data/euCitiesFull'
 
+// UKWW region countries (reported through UK CDP but not in Europe)
+const UKWW_COUNTRIES = [
+  'South Africa', 'Ethiopia', 'Turkiye', 'Pakistan', 'Israel',
+  'Senegal', 'Ghana', 'Jordan', 'Kenya', "Cote d'Ivoire"
+]
+
 function EUCitiesDashboard() {
   const { setSelectedId, selectedCountry, setSelectedCountry } = useOrganization()
   const [sortBy, setSortBy] = useState('name')
+  const [selectedRegion, setSelectedRegion] = useState('europe') // 'europe' or 'ukww'
 
-  const euCities = euCitiesFull
-  const euCountries = euCountriesFull
+  // Separate cities by region
+  const ukwwCities = euCitiesFull.filter(c => UKWW_COUNTRIES.includes(c.country))
+  const europeCities = euCitiesFull.filter(c => !UKWW_COUNTRIES.includes(c.country))
+
+  // Get countries for current region
+  const ukwwCountries = [...new Set(ukwwCities.map(c => c.country))].sort()
+  const europeCountries = euCountriesFull.filter(c => !UKWW_COUNTRIES.includes(c))
+
+  // Select cities based on region
+  const regionCities = selectedRegion === 'ukww' ? ukwwCities : europeCities
+  const regionCountries = selectedRegion === 'ukww' ? ukwwCountries : europeCountries
 
   // Filter by country if selected
   const filteredCities = selectedCountry === 'all'
-    ? euCities
-    : euCities.filter(c => c.country === selectedCountry)
+    ? regionCities
+    : regionCities.filter(c => c.country === selectedCountry)
 
   // Helper to get emissions from q3_1_3 data
   const getCityEmissions = (city) => {
@@ -47,19 +63,19 @@ function EUCitiesDashboard() {
 
   // Compute aggregates
   const stats = {
-    totalCities: euCities.length,
+    totalCities: regionCities.length,
     filteredCount: filteredCities.length,
-    countries: euCountries.length,
+    countries: regionCountries.length,
     totalPopulation: filteredCities.reduce((sum, c) => sum + getPopulation(c), 0),
     emissions: totalEmissions,
     citiesWithEmissions,
     withHazards: filteredCities.filter(c => (c.q2_2?.length || 0) > 0).length,
     totalHazards: filteredCities.reduce((sum, c) => sum + (c.q2_2?.length || 0), 0),
     withTargets: filteredCities.filter(c => (c.q6_1_1?.length || 0) > 0).length,
-    byCountry: euCountries.map(country => ({
+    byCountry: regionCountries.map(country => ({
       country,
-      count: euCities.filter(c => c.country === country).length,
-      population: euCities.filter(c => c.country === country).reduce((s, c) => s + getPopulation(c), 0)
+      count: regionCities.filter(c => c.country === country).length,
+      population: regionCities.filter(c => c.country === country).reduce((s, c) => s + getPopulation(c), 0)
     })).sort((a, b) => b.count - a.count)
   }
 
@@ -87,13 +103,19 @@ function EUCitiesDashboard() {
   return (
     <div className="max-w-7xl mx-auto space-y-6">
       {/* Hero */}
-      <div className="bg-gradient-to-br from-green-600 to-emerald-700 rounded-2xl p-8 text-white">
+      <div className={`rounded-2xl p-8 text-white ${
+        selectedRegion === 'ukww'
+          ? 'bg-gradient-to-br from-amber-600 to-orange-700'
+          : 'bg-gradient-to-br from-green-600 to-emerald-700'
+      }`}>
         <div className="flex items-center gap-4 mb-4">
           <div className="w-14 h-14 bg-white/20 rounded-xl flex items-center justify-center">
             <Globe className="w-8 h-8" />
           </div>
           <div>
-            <h1 className="text-2xl font-bold">European Cities</h1>
+            <h1 className="text-2xl font-bold">
+              {selectedRegion === 'ukww' ? 'UKWW Cities' : 'European Cities'}
+            </h1>
             <p className="text-white/80">{stats.totalCities} cities across {stats.countries} countries</p>
           </div>
         </div>
@@ -101,6 +123,33 @@ function EUCitiesDashboard() {
           <Info className="w-4 h-4" />
           CDP 2025 city climate disclosures
         </p>
+      </div>
+
+      {/* Region Toggle */}
+      <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-4">
+        <div className="flex items-center gap-2">
+          <span className="text-sm font-medium text-gray-600 mr-2">Region:</span>
+          <button
+            onClick={() => { setSelectedRegion('europe'); setSelectedCountry('all'); }}
+            className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+              selectedRegion === 'europe'
+                ? 'bg-green-100 text-green-700 border border-green-200'
+                : 'bg-gray-50 text-gray-600 hover:bg-gray-100 border border-transparent'
+            }`}
+          >
+            Europe ({europeCities.length})
+          </button>
+          <button
+            onClick={() => { setSelectedRegion('ukww'); setSelectedCountry('all'); }}
+            className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+              selectedRegion === 'ukww'
+                ? 'bg-amber-100 text-amber-700 border border-amber-200'
+                : 'bg-gray-50 text-gray-600 hover:bg-gray-100 border border-transparent'
+            }`}
+          >
+            UKWW ({ukwwCities.length})
+          </button>
+        </div>
       </div>
 
       {/* Stats Grid */}
@@ -216,11 +265,17 @@ function EUCitiesDashboard() {
             <button
               key={city.id}
               onClick={() => setSelectedId(city.id)}
-              className="w-full px-6 py-4 flex items-center justify-between hover:bg-green-50 transition-colors text-left"
+              className={`w-full px-6 py-4 flex items-center justify-between transition-colors text-left ${
+                selectedRegion === 'ukww' ? 'hover:bg-amber-50' : 'hover:bg-green-50'
+              }`}
             >
               <div className="flex items-center gap-4">
-                <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
-                  <MapPin className="w-5 h-5 text-green-600" />
+                <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${
+                  selectedRegion === 'ukww' ? 'bg-amber-100' : 'bg-green-100'
+                }`}>
+                  <MapPin className={`w-5 h-5 ${
+                    selectedRegion === 'ukww' ? 'text-amber-600' : 'text-green-600'
+                  }`} />
                 </div>
                 <div>
                   <p className="font-medium text-gray-800">{city.name}</p>
