@@ -3,19 +3,37 @@ import { entities, getEntityById, entityTypes } from '../data/belgianEntities'
 import { euCitiesFull as allEuropeanCities, getEUCityById as getCityById, euCountriesFull as allEuropeanCountries } from '../data/euCitiesFull'
 import { ukCitiesFull as allUKCities, getUKCityById } from '../data/ukCitiesFull'
 
+// UKWW region countries (reported through UK CDP but not in Europe)
+const UKWW_COUNTRIES = [
+  'South Africa', 'Ethiopia', 'Turkiye', 'Pakistan', 'Israel',
+  'Senegal', 'Ghana', 'Jordan', 'Kenya', "Cote d'Ivoire"
+]
+
 // Sort UK cities alphabetically
 const ukCities = [...allUKCities].sort((a, b) => a.name.localeCompare(b.name))
 
-// Sort European cities alphabetically (UK already excluded in data)
-const europeanCities = [...allEuropeanCities].sort((a, b) => a.name.localeCompare(b.name))
+// Separate UKWW cities from European cities
+const ukwwCities = [...allEuropeanCities]
+  .filter(c => UKWW_COUNTRIES.includes(c.country))
+  .sort((a, b) => a.name.localeCompare(b.name))
 
-const europeanCountries = [...allEuropeanCountries].sort((a, b) => a.localeCompare(b))
+// Sort European cities alphabetically (exclude UKWW countries)
+const europeanCities = [...allEuropeanCities]
+  .filter(c => !UKWW_COUNTRIES.includes(c.country))
+  .sort((a, b) => a.name.localeCompare(b.name))
+
+const europeanCountries = [...allEuropeanCountries]
+  .filter(c => !UKWW_COUNTRIES.includes(c))
+  .sort((a, b) => a.localeCompare(b))
+
+const ukwwCountries = [...new Set(ukwwCities.map(c => c.country))].sort()
 
 export const CATEGORIES = {
   BELGIAN_BANKS: 'belgian_banks',
   BELGIAN_INSURANCE: 'belgian_insurance',
   EUROPEAN_CITIES: 'european_cities',
-  UK_CITIES: 'uk_cities'
+  UK_CITIES: 'uk_cities',
+  UKWW_CITIES: 'ukww_cities'
 }
 
 const OrganizationContext = createContext()
@@ -37,6 +55,9 @@ export function OrganizationProvider({ children }) {
         return europeanCities.filter(c => c?.country === selectedCountry) || []
       case CATEGORIES.UK_CITIES:
         return ukCities || []
+      case CATEGORIES.UKWW_CITIES:
+        if (selectedCountry === 'all') return ukwwCities || []
+        return ukwwCities.filter(c => c?.country === selectedCountry) || []
       default:
         return entities || []
     }
@@ -51,7 +72,7 @@ export function OrganizationProvider({ children }) {
       if (city) return city
       return currentEntities[0] || { id: 'default', name: 'No UK cities available' }
     }
-    if (category === CATEGORIES.EUROPEAN_CITIES) {
+    if (category === CATEGORIES.EUROPEAN_CITIES || category === CATEGORIES.UKWW_CITIES) {
       const city = getCityById(selectedId)
       if (city) return city
       return currentEntities[0] || { id: 'default', name: 'No cities available' }
@@ -77,6 +98,8 @@ export function OrganizationProvider({ children }) {
       setSelectedId(europeanCities[0]?.id || '3422')
     } else if (newCategory === CATEGORIES.UK_CITIES) {
       setSelectedId(ukCities[0]?.id || '3422')
+    } else if (newCategory === CATEGORIES.UKWW_CITIES) {
+      setSelectedId(ukwwCities[0]?.id || '3422')
     }
   }
 
@@ -91,12 +114,15 @@ export function OrganizationProvider({ children }) {
     allInsurers: entities.filter(e => e.type === entityTypes.INSURANCE),
     allCities: europeanCities,
     allUKCities: ukCities,
+    allUKWWCities: ukwwCities,
     europeanCountries,
+    ukwwCountries,
     selectedCountry,
     setSelectedCountry,
-    isCity: category === CATEGORIES.EUROPEAN_CITIES || category === CATEGORIES.UK_CITIES,
+    isCity: category === CATEGORIES.EUROPEAN_CITIES || category === CATEGORIES.UK_CITIES || category === CATEGORIES.UKWW_CITIES,
     isUKCity: category === CATEGORIES.UK_CITIES,
     isEuropeanCity: category === CATEGORIES.EUROPEAN_CITIES,
+    isUKWWCity: category === CATEGORIES.UKWW_CITIES,
     isBank: category === CATEGORIES.BELGIAN_BANKS,
     isInsurance: category === CATEGORIES.BELGIAN_INSURANCE
   }

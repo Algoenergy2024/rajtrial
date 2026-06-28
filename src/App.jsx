@@ -35,6 +35,7 @@ const CATEGORY_TABS = [
   { key: CATEGORIES.BELGIAN_INSURANCE, label: 'Insurance', shortLabel: 'Ins.', icon: Shield, color: 'purple' },
   { key: CATEGORIES.EUROPEAN_CITIES, label: 'EU Cities', shortLabel: 'EU', icon: Globe, color: 'green' },
   { key: CATEGORIES.UK_CITIES, label: 'UK Cities', shortLabel: 'UK', icon: Flag, color: 'indigo' },
+  { key: CATEGORIES.UKWW_CITIES, label: 'UKWW', shortLabel: 'UKWW', icon: Globe, color: 'amber' },
 ]
 import Dashboard from './pages/Dashboard'
 import ClimateAction from './pages/ClimateAction'
@@ -78,6 +79,20 @@ import UKAIAutomation from './pages/UKAIAutomation'
 import EUCityDashboard from './pages/EUCityDashboard'
 import EUCityComparison from './pages/EUCityComparison'
 import EUAIAutomation from './pages/EUAIAutomation'
+import UKWWCitiesDashboard from './pages/UKWWCitiesDashboard'
+import UKWWCityDashboard from './pages/UKWWCityDashboard'
+import UKWWCityComparison from './pages/UKWWCityComparison'
+import UKWWAIAutomation from './pages/UKWWAIAutomation'
+import UKWWQ1Detail from './pages/UKWWQ1Detail'
+import UKWWQ2Detail from './pages/UKWWQ2Detail'
+import UKWWQ3Detail from './pages/UKWWQ3Detail'
+import UKWWQ4Detail from './pages/UKWWQ4Detail'
+import UKWWQ5Detail from './pages/UKWWQ5Detail'
+import UKWWQ6Detail from './pages/UKWWQ6Detail'
+import UKWWQ7Detail from './pages/UKWWQ7Detail'
+import UKWWQ8Detail from './pages/UKWWQ8Detail'
+import UKWWQ9Detail from './pages/UKWWQ9Detail'
+import UKWWQ11Detail from './pages/UKWWQ11Detail'
 
 // Navigation for Belgian Banks
 const banksNavigation = [
@@ -149,6 +164,29 @@ const ukCDPQuestions = [
   { name: 'Q8 Plans', href: '/uk-q8', icon: ClipboardList },
   { name: 'Q9 Actions', href: '/uk-q9', icon: Zap },
   { name: 'Q11 Additional', href: '/uk-q11', icon: FileText },
+]
+
+// Navigation for UKWW cities (uses EU data structure)
+const ukwwNavigation = [
+  { name: 'Overview', href: '/ukww-cities', icon: LayoutDashboard },
+  { name: 'Entity Dashboard', href: '/ukww-dashboard', icon: MapPin },
+  { name: 'CDP Questions', href: null, icon: FileText, isDropdown: true, dropdownType: 'ukww' },
+  { name: 'City Comparison', href: '/ukww-comparison', icon: TrendingUp },
+  { name: 'AI & Automation', href: '/ukww-ai', icon: Brain },
+]
+
+// CDP Question pages for UKWW Cities dropdown (reuses EU structure)
+const ukwwCDPQuestions = [
+  { name: 'Q1 Profile', href: '/ukww-q1', icon: FileText },
+  { name: 'Q2 Hazards', href: '/ukww-q2', icon: CloudRain },
+  { name: 'Q3 Emissions', href: '/ukww-q3', icon: Factory },
+  { name: 'Q4 Energy', href: '/ukww-q4', icon: Zap },
+  { name: 'Q5 Adaptation', href: '/ukww-q5', icon: Shield },
+  { name: 'Q6 Targets', href: '/ukww-q6', icon: Target },
+  { name: 'Q7 Other', href: '/ukww-q7', icon: Target },
+  { name: 'Q8 Plans', href: '/ukww-q8', icon: ClipboardList },
+  { name: 'Q9 Actions', href: '/ukww-q9', icon: Zap },
+  { name: 'Q11 Additional', href: '/ukww-q11', icon: FileText },
 ]
 
 // CDP Regions for cities sidebar
@@ -225,20 +263,23 @@ function AppContent() {
   const [cdpDropdownOpen, setCdpDropdownOpen] = useState(false)
   const location = useLocation()
   const navigate = useNavigate()
-  const { category, setCategory, isCity, isUKCity, isEuropeanCity } = useOrganization()
+  const { category, setCategory, isCity, isUKCity, isEuropeanCity, isUKWWCity } = useOrganization()
 
   // Check if current page is a CDP question page
   const isOnUKCDPPage = ukCDPQuestions.some(q => q.href === location.pathname)
   const isOnEUCDPPage = euCDPQuestions.some(q => q.href === location.pathname)
-  const isOnCDPPage = isOnUKCDPPage || isOnEUCDPPage
+  const isOnUKWWCDPPage = ukwwCDPQuestions.some(q => q.href === location.pathname)
+  const isOnCDPPage = isOnUKCDPPage || isOnEUCDPPage || isOnUKWWCDPPage
 
   const navigation = isUKCity
     ? ukCitiesNavigation
     : isEuropeanCity
       ? citiesNavigation
-      : category === CATEGORIES.BELGIAN_INSURANCE
-        ? insuranceNavigation
-        : banksNavigation
+      : isUKWWCity
+        ? ukwwNavigation
+        : category === CATEGORIES.BELGIAN_INSURANCE
+          ? insuranceNavigation
+          : banksNavigation
 
   // Handle category change with automatic navigation to category dashboard
   const handleCategoryChange = (newCategory) => {
@@ -250,6 +291,9 @@ function AppContent() {
         break
       case CATEGORIES.EUROPEAN_CITIES:
         navigate('/eu-cities')
+        break
+      case CATEGORIES.UKWW_CITIES:
+        navigate('/ukww-cities')
         break
       case CATEGORIES.BELGIAN_INSURANCE:
         navigate('/insurance')
@@ -317,10 +361,18 @@ function AppContent() {
               const Icon = item.icon
               const isActive = item.href ? location.pathname === item.href : isOnCDPPage
 
-              // Handle dropdown items (CDP Questions for UK or EU)
-              if (item.isDropdown && (isUKCity || isEuropeanCity)) {
-                const questions = item.dropdownType === 'eu' ? euCDPQuestions : ukCDPQuestions
-                const activeColor = isEuropeanCity ? 'bg-green-100 text-green-700' : 'bg-indigo-100 text-indigo-700'
+              // Handle dropdown items (CDP Questions for UK, EU, or UKWW)
+              if (item.isDropdown && (isUKCity || isEuropeanCity || isUKWWCity)) {
+                const questions = item.dropdownType === 'eu'
+                  ? euCDPQuestions
+                  : item.dropdownType === 'ukww'
+                    ? ukwwCDPQuestions
+                    : ukCDPQuestions
+                const activeColor = isEuropeanCity
+                  ? 'bg-green-100 text-green-700'
+                  : isUKWWCity
+                    ? 'bg-amber-100 text-amber-700'
+                    : 'bg-indigo-100 text-indigo-700'
                 return (
                   <li key={item.name}>
                     <button
@@ -565,6 +617,20 @@ function AppContent() {
             <Route path="/eu-q8" element={<EUQ8Detail />} />
             <Route path="/eu-q9" element={<EUQ9Detail />} />
             <Route path="/eu-q11" element={<EUQ11Detail />} />
+            <Route path="/ukww-cities" element={<UKWWCitiesDashboard />} />
+            <Route path="/ukww-dashboard" element={<UKWWCityDashboard />} />
+            <Route path="/ukww-comparison" element={<UKWWCityComparison />} />
+            <Route path="/ukww-ai" element={<UKWWAIAutomation />} />
+            <Route path="/ukww-q1" element={<UKWWQ1Detail />} />
+            <Route path="/ukww-q2" element={<UKWWQ2Detail />} />
+            <Route path="/ukww-q3" element={<UKWWQ3Detail />} />
+            <Route path="/ukww-q4" element={<UKWWQ4Detail />} />
+            <Route path="/ukww-q5" element={<UKWWQ5Detail />} />
+            <Route path="/ukww-q6" element={<UKWWQ6Detail />} />
+            <Route path="/ukww-q7" element={<UKWWQ7Detail />} />
+            <Route path="/ukww-q8" element={<UKWWQ8Detail />} />
+            <Route path="/ukww-q9" element={<UKWWQ9Detail />} />
+            <Route path="/ukww-q11" element={<UKWWQ11Detail />} />
             <Route path="/cities" element={<Cities />} />
             <Route path="/climate" element={<ClimateAction />} />
             <Route path="/social" element={<SocialImpact />} />

@@ -4,26 +4,18 @@ import {
   ArrowRight, Info
 } from 'lucide-react'
 import { useOrganization } from '../context/OrganizationContext'
-import { euCitiesFull, euCountriesFull } from '../data/euCitiesFull'
 
-// UKWW region countries (excluded from EU dashboard - they have their own tab)
-const UKWW_COUNTRIES = [
-  'South Africa', 'Ethiopia', 'Turkiye', 'Pakistan', 'Israel',
-  'Senegal', 'Ghana', 'Jordan', 'Kenya', "Cote d'Ivoire"
-]
-
-function EUCitiesDashboard() {
-  const { setSelectedId, selectedCountry, setSelectedCountry } = useOrganization()
+function UKWWCitiesDashboard() {
+  const { setSelectedId, selectedCountry, setSelectedCountry, allUKWWCities, ukwwCountries } = useOrganization()
   const [sortBy, setSortBy] = useState('name')
 
-  // EU cities only (exclude UKWW countries)
-  const europeCities = euCitiesFull.filter(c => !UKWW_COUNTRIES.includes(c.country))
-  const europeCountries = euCountriesFull.filter(c => !UKWW_COUNTRIES.includes(c))
+  const ukwwCities = allUKWWCities || []
+  const countries = ukwwCountries || []
 
   // Filter by country if selected
   const filteredCities = selectedCountry === 'all'
-    ? europeCities
-    : europeCities.filter(c => c.country === selectedCountry)
+    ? ukwwCities
+    : ukwwCities.filter(c => c.country === selectedCountry)
 
   // Helper to get emissions from q3_1_3 data
   const getCityEmissions = (city) => {
@@ -54,19 +46,19 @@ function EUCitiesDashboard() {
 
   // Compute aggregates
   const stats = {
-    totalCities: europeCities.length,
+    totalCities: ukwwCities.length,
     filteredCount: filteredCities.length,
-    countries: europeCountries.length,
+    countries: countries.length,
     totalPopulation: filteredCities.reduce((sum, c) => sum + getPopulation(c), 0),
     emissions: totalEmissions,
     citiesWithEmissions,
     withHazards: filteredCities.filter(c => (c.q2_2?.length || 0) > 0).length,
     totalHazards: filteredCities.reduce((sum, c) => sum + (c.q2_2?.length || 0), 0),
     withTargets: filteredCities.filter(c => (c.q6_1_1?.length || 0) > 0).length,
-    byCountry: europeCountries.map(country => ({
+    byCountry: countries.map(country => ({
       country,
-      count: europeCities.filter(c => c.country === country).length,
-      population: europeCities.filter(c => c.country === country).reduce((s, c) => s + getPopulation(c), 0)
+      count: ukwwCities.filter(c => c.country === country).length,
+      population: ukwwCities.filter(c => c.country === country).reduce((s, c) => s + getPopulation(c), 0)
     })).sort((a, b) => b.count - a.count)
   }
 
@@ -94,19 +86,19 @@ function EUCitiesDashboard() {
   return (
     <div className="max-w-7xl mx-auto space-y-6">
       {/* Hero */}
-      <div className="bg-gradient-to-br from-green-600 to-emerald-700 rounded-2xl p-8 text-white">
+      <div className="bg-gradient-to-br from-amber-600 to-orange-700 rounded-2xl p-8 text-white">
         <div className="flex items-center gap-4 mb-4">
           <div className="w-14 h-14 bg-white/20 rounded-xl flex items-center justify-center">
             <Globe className="w-8 h-8" />
           </div>
           <div>
-            <h1 className="text-2xl font-bold">European Cities</h1>
+            <h1 className="text-2xl font-bold">UKWW Cities</h1>
             <p className="text-white/80">{stats.totalCities} cities across {stats.countries} countries</p>
           </div>
         </div>
         <p className="text-white/70 text-sm flex items-center gap-2">
           <Info className="w-4 h-4" />
-          CDP 2025 city climate disclosures - European region
+          CDP 2025 city climate disclosures - UK Wider World region
         </p>
       </div>
 
@@ -145,22 +137,22 @@ function EUCitiesDashboard() {
       {/* Emissions Overview */}
       <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-6">
         <div className="flex items-center gap-2 mb-4">
-          <Factory className="w-5 h-5 text-purple-600" />
+          <Factory className="w-5 h-5 text-amber-600" />
           <h2 className="font-semibold text-gray-800">Total Emissions (tCO2e)</h2>
           <span className="text-xs text-gray-500 ml-2">from {stats.citiesWithEmissions} reporting cities</span>
         </div>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          <div className="bg-purple-50 rounded-xl p-4">
-            <p className="text-sm text-purple-600 font-medium mb-1">Scope 1 (Direct)</p>
-            <p className="text-2xl font-bold text-purple-700">{formatNumber(stats.emissions.scope1)}</p>
+          <div className="bg-amber-50 rounded-xl p-4">
+            <p className="text-sm text-amber-600 font-medium mb-1">Scope 1 (Direct)</p>
+            <p className="text-2xl font-bold text-amber-700">{formatNumber(stats.emissions.scope1)}</p>
           </div>
-          <div className="bg-indigo-50 rounded-xl p-4">
-            <p className="text-sm text-indigo-600 font-medium mb-1">Scope 2 (Grid)</p>
-            <p className="text-2xl font-bold text-indigo-700">{formatNumber(stats.emissions.scope2)}</p>
+          <div className="bg-orange-50 rounded-xl p-4">
+            <p className="text-sm text-orange-600 font-medium mb-1">Scope 2 (Grid)</p>
+            <p className="text-2xl font-bold text-orange-700">{formatNumber(stats.emissions.scope2)}</p>
           </div>
-          <div className="bg-blue-50 rounded-xl p-4">
-            <p className="text-sm text-blue-600 font-medium mb-1">Scope 3 (Outside)</p>
-            <p className="text-2xl font-bold text-blue-700">{formatNumber(stats.emissions.scope3)}</p>
+          <div className="bg-yellow-50 rounded-xl p-4">
+            <p className="text-sm text-yellow-600 font-medium mb-1">Scope 3 (Outside)</p>
+            <p className="text-2xl font-bold text-yellow-700">{formatNumber(stats.emissions.scope3)}</p>
           </div>
           <div className="bg-gray-100 rounded-xl p-4">
             <p className="text-sm text-gray-600 font-medium mb-1">Total</p>
@@ -177,19 +169,19 @@ function EUCitiesDashboard() {
             onClick={() => setSelectedCountry('all')}
             className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
               selectedCountry === 'all'
-                ? 'bg-green-100 text-green-700 border border-green-200'
+                ? 'bg-amber-100 text-amber-700 border border-amber-200'
                 : 'bg-gray-50 text-gray-600 hover:bg-gray-100 border border-transparent'
             }`}
           >
             All ({stats.totalCities})
           </button>
-          {stats.byCountry.slice(0, 10).map(({ country, count }) => (
+          {stats.byCountry.map(({ country, count }) => (
             <button
               key={country}
               onClick={() => setSelectedCountry(country)}
               className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
                 selectedCountry === country
-                  ? 'bg-green-100 text-green-700 border border-green-200'
+                  ? 'bg-amber-100 text-amber-700 border border-amber-200'
                   : 'bg-gray-50 text-gray-600 hover:bg-gray-100 border border-transparent'
               }`}
             >
@@ -203,14 +195,14 @@ function EUCitiesDashboard() {
       <div className="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden">
         <div className="px-6 py-4 border-b border-gray-100 bg-gray-50 flex items-center justify-between">
           <h2 className="font-semibold text-gray-800">
-            {selectedCountry === 'all' ? 'All European Cities' : `Cities in ${selectedCountry}`}
+            {selectedCountry === 'all' ? 'All UKWW Cities' : `Cities in ${selectedCountry}`}
           </h2>
           <div className="flex items-center gap-2">
             <span className="text-sm text-gray-500">Sort by:</span>
             <select
               value={sortBy}
               onChange={(e) => setSortBy(e.target.value)}
-              className="text-sm border border-gray-200 rounded-lg px-2 py-1 focus:outline-none focus:ring-2 focus:ring-green-500"
+              className="text-sm border border-gray-200 rounded-lg px-2 py-1 focus:outline-none focus:ring-2 focus:ring-amber-500"
             >
               <option value="population">Population</option>
               <option value="name">Name</option>
@@ -223,11 +215,11 @@ function EUCitiesDashboard() {
             <button
               key={city.id}
               onClick={() => setSelectedId(city.id)}
-              className="w-full px-6 py-4 flex items-center justify-between hover:bg-green-50 transition-colors text-left"
+              className="w-full px-6 py-4 flex items-center justify-between hover:bg-amber-50 transition-colors text-left"
             >
               <div className="flex items-center gap-4">
-                <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
-                  <MapPin className="w-5 h-5 text-green-600" />
+                <div className="w-10 h-10 bg-amber-100 rounded-lg flex items-center justify-center">
+                  <MapPin className="w-5 h-5 text-amber-600" />
                 </div>
                 <div>
                   <p className="font-medium text-gray-800">{city.name}</p>
@@ -264,11 +256,11 @@ function EUCitiesDashboard() {
       <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 flex items-start gap-3">
         <AlertTriangle className="w-5 h-5 text-amber-600 flex-shrink-0 mt-0.5" />
         <p className="text-sm text-amber-700">
-          Data from CDP city disclosures. Reporting completeness varies by city. Some emissions and target data may be incomplete.
+          UKWW (UK Wider World) includes cities from South Africa, Ethiopia, Turkiye, Pakistan, Israel, Senegal, Ghana, Jordan, Kenya, and Cote d'Ivoire reporting through the UK CDP program.
         </p>
       </div>
     </div>
   )
 }
 
-export default EUCitiesDashboard
+export default UKWWCitiesDashboard
