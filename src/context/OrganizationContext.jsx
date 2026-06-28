@@ -2,6 +2,7 @@ import React, { createContext, useContext, useState } from 'react'
 import { entities, getEntityById, entityTypes } from '../data/belgianEntities'
 import { euCitiesFull as allEuropeanCities, getEUCityById as getCityById, euCountriesFull as allEuropeanCountries } from '../data/euCitiesFull'
 import { ukCitiesFull as allUKCities, getUKCityById } from '../data/ukCitiesFull'
+import { chinaCitiesFull as allChinaCities, getChinaCityById, chinaCountriesFull as allChinaCountries } from '../data/chinaCitiesFull'
 
 // UKWW region countries (reported through UK CDP but not in Europe)
 const UKWW_COUNTRIES = [
@@ -11,6 +12,10 @@ const UKWW_COUNTRIES = [
 
 // Sort UK cities alphabetically
 const ukCities = [...allUKCities].sort((a, b) => a.name.localeCompare(b.name))
+
+// Sort China cities alphabetically
+const chinaCities = [...allChinaCities].sort((a, b) => a.name.localeCompare(b.name))
+const chinaCountries = [...allChinaCountries].sort()
 
 // Separate UKWW cities from European cities
 const ukwwCities = [...allEuropeanCities]
@@ -33,7 +38,8 @@ export const CATEGORIES = {
   BELGIAN_INSURANCE: 'belgian_insurance',
   EUROPEAN_CITIES: 'european_cities',
   UK_CITIES: 'uk_cities',
-  UKWW_CITIES: 'ukww_cities'
+  UKWW_CITIES: 'ukww_cities',
+  CHINA_CITIES: 'china_cities'
 }
 
 const OrganizationContext = createContext()
@@ -58,6 +64,9 @@ export function OrganizationProvider({ children }) {
       case CATEGORIES.UKWW_CITIES:
         if (selectedCountry === 'all') return ukwwCities || []
         return ukwwCities.filter(c => c?.country === selectedCountry) || []
+      case CATEGORIES.CHINA_CITIES:
+        if (selectedCountry === 'all') return chinaCities || []
+        return chinaCities.filter(c => c?.country === selectedCountry) || []
       default:
         return entities || []
     }
@@ -71,6 +80,11 @@ export function OrganizationProvider({ children }) {
       const city = getUKCityById(selectedId)
       if (city) return city
       return currentEntities[0] || { id: 'default', name: 'No UK cities available' }
+    }
+    if (category === CATEGORIES.CHINA_CITIES) {
+      const city = getChinaCityById(selectedId)
+      if (city) return city
+      return currentEntities[0] || { id: 'default', name: 'No China cities available' }
     }
     if (category === CATEGORIES.EUROPEAN_CITIES || category === CATEGORIES.UKWW_CITIES) {
       const city = getCityById(selectedId)
@@ -100,6 +114,8 @@ export function OrganizationProvider({ children }) {
       setSelectedId(ukCities[0]?.id || '3422')
     } else if (newCategory === CATEGORIES.UKWW_CITIES) {
       setSelectedId(ukwwCities[0]?.id || '3422')
+    } else if (newCategory === CATEGORIES.CHINA_CITIES) {
+      setSelectedId(chinaCities[0]?.id || '3422')
     }
   }
 
@@ -115,14 +131,17 @@ export function OrganizationProvider({ children }) {
     allCities: europeanCities,
     allUKCities: ukCities,
     allUKWWCities: ukwwCities,
+    allChinaCities: chinaCities,
     europeanCountries,
     ukwwCountries,
+    chinaCountries,
     selectedCountry,
     setSelectedCountry,
-    isCity: category === CATEGORIES.EUROPEAN_CITIES || category === CATEGORIES.UK_CITIES || category === CATEGORIES.UKWW_CITIES,
+    isCity: category === CATEGORIES.EUROPEAN_CITIES || category === CATEGORIES.UK_CITIES || category === CATEGORIES.UKWW_CITIES || category === CATEGORIES.CHINA_CITIES,
     isUKCity: category === CATEGORIES.UK_CITIES,
     isEuropeanCity: category === CATEGORIES.EUROPEAN_CITIES,
     isUKWWCity: category === CATEGORIES.UKWW_CITIES,
+    isChinaCity: category === CATEGORIES.CHINA_CITIES,
     isBank: category === CATEGORIES.BELGIAN_BANKS,
     isInsurance: category === CATEGORIES.BELGIAN_INSURANCE
   }

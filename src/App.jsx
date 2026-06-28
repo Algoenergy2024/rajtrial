@@ -36,6 +36,7 @@ const CATEGORY_TABS = [
   { key: CATEGORIES.EUROPEAN_CITIES, label: 'EU Cities', shortLabel: 'EU', icon: Globe, color: 'green' },
   { key: CATEGORIES.UK_CITIES, label: 'UK Cities', shortLabel: 'UK', icon: Flag, color: 'indigo' },
   { key: CATEGORIES.UKWW_CITIES, label: 'UKWW', shortLabel: 'UKWW', icon: Globe, color: 'amber' },
+  { key: CATEGORIES.CHINA_CITIES, label: 'China', shortLabel: 'China', icon: Globe, color: 'red' },
 ]
 import Dashboard from './pages/Dashboard'
 import ClimateAction from './pages/ClimateAction'
@@ -93,6 +94,20 @@ import UKWWQ7Detail from './pages/UKWWQ7Detail'
 import UKWWQ8Detail from './pages/UKWWQ8Detail'
 import UKWWQ9Detail from './pages/UKWWQ9Detail'
 import UKWWQ11Detail from './pages/UKWWQ11Detail'
+import ChinaCitiesDashboard from './pages/ChinaCitiesDashboard'
+import ChinaCityDashboard from './pages/ChinaCityDashboard'
+import ChinaCityComparison from './pages/ChinaCityComparison'
+import ChinaAIAutomation from './pages/ChinaAIAutomation'
+import ChinaQ1Detail from './pages/ChinaQ1Detail'
+import ChinaQ2Detail from './pages/ChinaQ2Detail'
+import ChinaQ3Detail from './pages/ChinaQ3Detail'
+import ChinaQ4Detail from './pages/ChinaQ4Detail'
+import ChinaQ5Detail from './pages/ChinaQ5Detail'
+import ChinaQ6Detail from './pages/ChinaQ6Detail'
+import ChinaQ7Detail from './pages/ChinaQ7Detail'
+import ChinaQ8Detail from './pages/ChinaQ8Detail'
+import ChinaQ9Detail from './pages/ChinaQ9Detail'
+import ChinaQ11Detail from './pages/ChinaQ11Detail'
 
 // Navigation for Belgian Banks
 const banksNavigation = [
@@ -189,6 +204,29 @@ const ukwwCDPQuestions = [
   { name: 'Q11 Additional', href: '/ukww-q11', icon: FileText },
 ]
 
+// Navigation for China cities
+const chinaNavigation = [
+  { name: 'Overview', href: '/china-cities', icon: LayoutDashboard },
+  { name: 'Entity Dashboard', href: '/china-dashboard', icon: MapPin },
+  { name: 'CDP Questions', href: null, icon: FileText, isDropdown: true, dropdownType: 'china' },
+  { name: 'City Comparison', href: '/china-comparison', icon: TrendingUp },
+  { name: 'AI & Automation', href: '/china-ai', icon: Brain },
+]
+
+// CDP Question pages for China Cities dropdown
+const chinaCDPQuestions = [
+  { name: 'Q1 Profile', href: '/china-q1', icon: FileText },
+  { name: 'Q2 Hazards', href: '/china-q2', icon: CloudRain },
+  { name: 'Q3 Emissions', href: '/china-q3', icon: Factory },
+  { name: 'Q4 Energy', href: '/china-q4', icon: Zap },
+  { name: 'Q5 Adaptation', href: '/china-q5', icon: Shield },
+  { name: 'Q6 Targets', href: '/china-q6', icon: Target },
+  { name: 'Q7 Other', href: '/china-q7', icon: Target },
+  { name: 'Q8 Plans', href: '/china-q8', icon: ClipboardList },
+  { name: 'Q9 Actions', href: '/china-q9', icon: Zap },
+  { name: 'Q11 Additional', href: '/china-q11', icon: FileText },
+]
+
 // CDP Regions for cities sidebar
 const cdpRegions = [
   { name: 'Europe', code: 'Europe', count: 148 },
@@ -263,13 +301,14 @@ function AppContent() {
   const [cdpDropdownOpen, setCdpDropdownOpen] = useState(false)
   const location = useLocation()
   const navigate = useNavigate()
-  const { category, setCategory, isCity, isUKCity, isEuropeanCity, isUKWWCity } = useOrganization()
+  const { category, setCategory, isCity, isUKCity, isEuropeanCity, isUKWWCity, isChinaCity } = useOrganization()
 
   // Check if current page is a CDP question page
   const isOnUKCDPPage = ukCDPQuestions.some(q => q.href === location.pathname)
   const isOnEUCDPPage = euCDPQuestions.some(q => q.href === location.pathname)
   const isOnUKWWCDPPage = ukwwCDPQuestions.some(q => q.href === location.pathname)
-  const isOnCDPPage = isOnUKCDPPage || isOnEUCDPPage || isOnUKWWCDPPage
+  const isOnChinaCDPPage = chinaCDPQuestions.some(q => q.href === location.pathname)
+  const isOnCDPPage = isOnUKCDPPage || isOnEUCDPPage || isOnUKWWCDPPage || isOnChinaCDPPage
 
   const navigation = isUKCity
     ? ukCitiesNavigation
@@ -277,9 +316,11 @@ function AppContent() {
       ? citiesNavigation
       : isUKWWCity
         ? ukwwNavigation
-        : category === CATEGORIES.BELGIAN_INSURANCE
-          ? insuranceNavigation
-          : banksNavigation
+        : isChinaCity
+          ? chinaNavigation
+          : category === CATEGORIES.BELGIAN_INSURANCE
+            ? insuranceNavigation
+            : banksNavigation
 
   // Handle category change with automatic navigation to category dashboard
   const handleCategoryChange = (newCategory) => {
@@ -294,6 +335,9 @@ function AppContent() {
         break
       case CATEGORIES.UKWW_CITIES:
         navigate('/ukww-cities')
+        break
+      case CATEGORIES.CHINA_CITIES:
+        navigate('/china-cities')
         break
       case CATEGORIES.BELGIAN_INSURANCE:
         navigate('/insurance')
@@ -344,12 +388,16 @@ function AppContent() {
           <div className="px-4 py-3 border-b border-gray-100">
             <div className={`px-3 py-2 rounded-lg text-sm font-medium ${
               isUKCity ? 'bg-indigo-50 text-indigo-700' :
-              isEuropeanCity ? 'bg-green-50 text-green-700' : 'bg-blue-50 text-blue-700'
+              isEuropeanCity ? 'bg-green-50 text-green-700' :
+              isUKWWCity ? 'bg-amber-50 text-amber-700' :
+              isChinaCity ? 'bg-red-50 text-red-700' : 'bg-blue-50 text-blue-700'
             }`}>
               {category === CATEGORIES.BELGIAN_BANKS && '🏦 Belgian Banks'}
               {category === CATEGORIES.BELGIAN_INSURANCE && '🛡️ Belgian Insurance'}
               {category === CATEGORIES.EUROPEAN_CITIES && '🏙️ European Cities'}
               {category === CATEGORIES.UK_CITIES && '🇬🇧 UK Cities'}
+              {category === CATEGORIES.UKWW_CITIES && '🌍 UKWW Cities'}
+              {category === CATEGORIES.CHINA_CITIES && '🇨🇳 China Cities'}
             </div>
           </div>
         )}
@@ -361,18 +409,22 @@ function AppContent() {
               const Icon = item.icon
               const isActive = item.href ? location.pathname === item.href : isOnCDPPage
 
-              // Handle dropdown items (CDP Questions for UK, EU, or UKWW)
-              if (item.isDropdown && (isUKCity || isEuropeanCity || isUKWWCity)) {
+              // Handle dropdown items (CDP Questions for UK, EU, UKWW, or China)
+              if (item.isDropdown && (isUKCity || isEuropeanCity || isUKWWCity || isChinaCity)) {
                 const questions = item.dropdownType === 'eu'
                   ? euCDPQuestions
                   : item.dropdownType === 'ukww'
                     ? ukwwCDPQuestions
-                    : ukCDPQuestions
+                    : item.dropdownType === 'china'
+                      ? chinaCDPQuestions
+                      : ukCDPQuestions
                 const activeColor = isEuropeanCity
                   ? 'bg-green-100 text-green-700'
                   : isUKWWCity
                     ? 'bg-amber-100 text-amber-700'
-                    : 'bg-indigo-100 text-indigo-700'
+                    : isChinaCity
+                      ? 'bg-red-100 text-red-700'
+                      : 'bg-indigo-100 text-indigo-700'
                 return (
                   <li key={item.name}>
                     <button
@@ -559,6 +611,8 @@ function AppContent() {
                   purple: isActive ? 'bg-purple-100 text-purple-700 border-purple-200' : 'hover:bg-purple-50 text-gray-600',
                   green: isActive ? 'bg-green-100 text-green-700 border-green-200' : 'hover:bg-green-50 text-gray-600',
                   indigo: isActive ? 'bg-indigo-100 text-indigo-700 border-indigo-200' : 'hover:bg-indigo-50 text-gray-600',
+                  amber: isActive ? 'bg-amber-100 text-amber-700 border-amber-200' : 'hover:bg-amber-50 text-gray-600',
+                  red: isActive ? 'bg-red-100 text-red-700 border-red-200' : 'hover:bg-red-50 text-gray-600',
                 }
                 return (
                   <button
@@ -631,6 +685,20 @@ function AppContent() {
             <Route path="/ukww-q8" element={<UKWWQ8Detail />} />
             <Route path="/ukww-q9" element={<UKWWQ9Detail />} />
             <Route path="/ukww-q11" element={<UKWWQ11Detail />} />
+            <Route path="/china-cities" element={<ChinaCitiesDashboard />} />
+            <Route path="/china-dashboard" element={<ChinaCityDashboard />} />
+            <Route path="/china-comparison" element={<ChinaCityComparison />} />
+            <Route path="/china-ai" element={<ChinaAIAutomation />} />
+            <Route path="/china-q1" element={<ChinaQ1Detail />} />
+            <Route path="/china-q2" element={<ChinaQ2Detail />} />
+            <Route path="/china-q3" element={<ChinaQ3Detail />} />
+            <Route path="/china-q4" element={<ChinaQ4Detail />} />
+            <Route path="/china-q5" element={<ChinaQ5Detail />} />
+            <Route path="/china-q6" element={<ChinaQ6Detail />} />
+            <Route path="/china-q7" element={<ChinaQ7Detail />} />
+            <Route path="/china-q8" element={<ChinaQ8Detail />} />
+            <Route path="/china-q9" element={<ChinaQ9Detail />} />
+            <Route path="/china-q11" element={<ChinaQ11Detail />} />
             <Route path="/cities" element={<Cities />} />
             <Route path="/climate" element={<ClimateAction />} />
             <Route path="/social" element={<SocialImpact />} />
