@@ -37,6 +37,7 @@ const CATEGORY_TABS = [
   { key: CATEGORIES.UK_CITIES, label: 'UK Cities', shortLabel: 'UK', icon: Flag, color: 'indigo' },
   { key: CATEGORIES.UKWW_CITIES, label: 'UKWW', shortLabel: 'UKWW', icon: Globe, color: 'amber' },
   { key: CATEGORIES.CHINA_CITIES, label: 'China', shortLabel: 'China', icon: Globe, color: 'red' },
+  { key: CATEGORIES.INDIA_CITIES, label: 'India', shortLabel: 'India', icon: Globe, color: 'orange' },
 ]
 import Dashboard from './pages/Dashboard'
 import ClimateAction from './pages/ClimateAction'
@@ -108,6 +109,20 @@ import ChinaQ7Detail from './pages/ChinaQ7Detail'
 import ChinaQ8Detail from './pages/ChinaQ8Detail'
 import ChinaQ9Detail from './pages/ChinaQ9Detail'
 import ChinaQ11Detail from './pages/ChinaQ11Detail'
+import IndiaCitiesDashboard from './pages/IndiaCitiesDashboard'
+import IndiaCityDashboard from './pages/IndiaCityDashboard'
+import IndiaCityComparison from './pages/IndiaCityComparison'
+import IndiaAIAutomation from './pages/IndiaAIAutomation'
+import IndiaQ1Detail from './pages/IndiaQ1Detail'
+import IndiaQ2Detail from './pages/IndiaQ2Detail'
+import IndiaQ3Detail from './pages/IndiaQ3Detail'
+import IndiaQ4Detail from './pages/IndiaQ4Detail'
+import IndiaQ5Detail from './pages/IndiaQ5Detail'
+import IndiaQ6Detail from './pages/IndiaQ6Detail'
+import IndiaQ7Detail from './pages/IndiaQ7Detail'
+import IndiaQ8Detail from './pages/IndiaQ8Detail'
+import IndiaQ9Detail from './pages/IndiaQ9Detail'
+import IndiaQ11Detail from './pages/IndiaQ11Detail'
 
 // Navigation for Belgian Banks
 const banksNavigation = [
@@ -227,6 +242,29 @@ const chinaCDPQuestions = [
   { name: 'Q11 Additional', href: '/china-q11', icon: FileText },
 ]
 
+// Navigation for India cities
+const indiaNavigation = [
+  { name: 'Overview', href: '/india-cities', icon: LayoutDashboard },
+  { name: 'Entity Dashboard', href: '/india-dashboard', icon: MapPin },
+  { name: 'CDP Questions', href: null, icon: FileText, isDropdown: true, dropdownType: 'india' },
+  { name: 'City Comparison', href: '/india-comparison', icon: TrendingUp },
+  { name: 'AI & Automation', href: '/india-ai', icon: Brain },
+]
+
+// CDP Question pages for India Cities dropdown
+const indiaCDPQuestions = [
+  { name: 'Q1 Profile', href: '/india-q1', icon: FileText },
+  { name: 'Q2 Hazards', href: '/india-q2', icon: CloudRain },
+  { name: 'Q3 Emissions', href: '/india-q3', icon: Factory },
+  { name: 'Q4 Energy', href: '/india-q4', icon: Zap },
+  { name: 'Q5 Adaptation', href: '/india-q5', icon: Shield },
+  { name: 'Q6 Targets', href: '/india-q6', icon: Target },
+  { name: 'Q7 Other', href: '/india-q7', icon: Target },
+  { name: 'Q8 Plans', href: '/india-q8', icon: ClipboardList },
+  { name: 'Q9 Actions', href: '/india-q9', icon: Zap },
+  { name: 'Q11 Additional', href: '/india-q11', icon: FileText },
+]
+
 // CDP Regions for cities sidebar
 const cdpRegions = [
   { name: 'Europe', code: 'Europe', count: 148 },
@@ -301,14 +339,15 @@ function AppContent() {
   const [cdpDropdownOpen, setCdpDropdownOpen] = useState(false)
   const location = useLocation()
   const navigate = useNavigate()
-  const { category, setCategory, isCity, isUKCity, isEuropeanCity, isUKWWCity, isChinaCity } = useOrganization()
+  const { category, setCategory, isCity, isUKCity, isEuropeanCity, isUKWWCity, isChinaCity, isIndiaCity } = useOrganization()
 
   // Check if current page is a CDP question page
   const isOnUKCDPPage = ukCDPQuestions.some(q => q.href === location.pathname)
   const isOnEUCDPPage = euCDPQuestions.some(q => q.href === location.pathname)
   const isOnUKWWCDPPage = ukwwCDPQuestions.some(q => q.href === location.pathname)
   const isOnChinaCDPPage = chinaCDPQuestions.some(q => q.href === location.pathname)
-  const isOnCDPPage = isOnUKCDPPage || isOnEUCDPPage || isOnUKWWCDPPage || isOnChinaCDPPage
+  const isOnIndiaCDPPage = indiaCDPQuestions.some(q => q.href === location.pathname)
+  const isOnCDPPage = isOnUKCDPPage || isOnEUCDPPage || isOnUKWWCDPPage || isOnChinaCDPPage || isOnIndiaCDPPage
 
   const navigation = isUKCity
     ? ukCitiesNavigation
@@ -318,9 +357,11 @@ function AppContent() {
         ? ukwwNavigation
         : isChinaCity
           ? chinaNavigation
-          : category === CATEGORIES.BELGIAN_INSURANCE
-            ? insuranceNavigation
-            : banksNavigation
+          : isIndiaCity
+            ? indiaNavigation
+            : category === CATEGORIES.BELGIAN_INSURANCE
+              ? insuranceNavigation
+              : banksNavigation
 
   // Handle category change with automatic navigation to category dashboard
   const handleCategoryChange = (newCategory) => {
@@ -338,6 +379,9 @@ function AppContent() {
         break
       case CATEGORIES.CHINA_CITIES:
         navigate('/china-cities')
+        break
+      case CATEGORIES.INDIA_CITIES:
+        navigate('/india-cities')
         break
       case CATEGORIES.BELGIAN_INSURANCE:
         navigate('/insurance')
@@ -390,7 +434,8 @@ function AppContent() {
               isUKCity ? 'bg-indigo-50 text-indigo-700' :
               isEuropeanCity ? 'bg-green-50 text-green-700' :
               isUKWWCity ? 'bg-amber-50 text-amber-700' :
-              isChinaCity ? 'bg-red-50 text-red-700' : 'bg-blue-50 text-blue-700'
+              isChinaCity ? 'bg-red-50 text-red-700' :
+              isIndiaCity ? 'bg-orange-50 text-orange-700' : 'bg-blue-50 text-blue-700'
             }`}>
               {category === CATEGORIES.BELGIAN_BANKS && '🏦 Belgian Banks'}
               {category === CATEGORIES.BELGIAN_INSURANCE && '🛡️ Belgian Insurance'}
@@ -398,6 +443,7 @@ function AppContent() {
               {category === CATEGORIES.UK_CITIES && '🇬🇧 UK Cities'}
               {category === CATEGORIES.UKWW_CITIES && '🌍 UKWW Cities'}
               {category === CATEGORIES.CHINA_CITIES && '🇨🇳 China Cities'}
+              {category === CATEGORIES.INDIA_CITIES && '🇮🇳 India Cities'}
             </div>
           </div>
         )}
@@ -409,22 +455,26 @@ function AppContent() {
               const Icon = item.icon
               const isActive = item.href ? location.pathname === item.href : isOnCDPPage
 
-              // Handle dropdown items (CDP Questions for UK, EU, UKWW, or China)
-              if (item.isDropdown && (isUKCity || isEuropeanCity || isUKWWCity || isChinaCity)) {
+              // Handle dropdown items (CDP Questions for UK, EU, UKWW, China, or India)
+              if (item.isDropdown && (isUKCity || isEuropeanCity || isUKWWCity || isChinaCity || isIndiaCity)) {
                 const questions = item.dropdownType === 'eu'
                   ? euCDPQuestions
                   : item.dropdownType === 'ukww'
                     ? ukwwCDPQuestions
                     : item.dropdownType === 'china'
                       ? chinaCDPQuestions
-                      : ukCDPQuestions
+                      : item.dropdownType === 'india'
+                        ? indiaCDPQuestions
+                        : ukCDPQuestions
                 const activeColor = isEuropeanCity
                   ? 'bg-green-100 text-green-700'
                   : isUKWWCity
                     ? 'bg-amber-100 text-amber-700'
                     : isChinaCity
                       ? 'bg-red-100 text-red-700'
-                      : 'bg-indigo-100 text-indigo-700'
+                      : isIndiaCity
+                        ? 'bg-orange-100 text-orange-700'
+                        : 'bg-indigo-100 text-indigo-700'
                 return (
                   <li key={item.name}>
                     <button
@@ -613,6 +663,7 @@ function AppContent() {
                   indigo: isActive ? 'bg-indigo-100 text-indigo-700 border-indigo-200' : 'hover:bg-indigo-50 text-gray-600',
                   amber: isActive ? 'bg-amber-100 text-amber-700 border-amber-200' : 'hover:bg-amber-50 text-gray-600',
                   red: isActive ? 'bg-red-100 text-red-700 border-red-200' : 'hover:bg-red-50 text-gray-600',
+                  orange: isActive ? 'bg-orange-100 text-orange-700 border-orange-200' : 'hover:bg-orange-50 text-gray-600',
                 }
                 return (
                   <button
@@ -699,6 +750,20 @@ function AppContent() {
             <Route path="/china-q8" element={<ChinaQ8Detail />} />
             <Route path="/china-q9" element={<ChinaQ9Detail />} />
             <Route path="/china-q11" element={<ChinaQ11Detail />} />
+            <Route path="/india-cities" element={<IndiaCitiesDashboard />} />
+            <Route path="/india-dashboard" element={<IndiaCityDashboard />} />
+            <Route path="/india-comparison" element={<IndiaCityComparison />} />
+            <Route path="/india-ai" element={<IndiaAIAutomation />} />
+            <Route path="/india-q1" element={<IndiaQ1Detail />} />
+            <Route path="/india-q2" element={<IndiaQ2Detail />} />
+            <Route path="/india-q3" element={<IndiaQ3Detail />} />
+            <Route path="/india-q4" element={<IndiaQ4Detail />} />
+            <Route path="/india-q5" element={<IndiaQ5Detail />} />
+            <Route path="/india-q6" element={<IndiaQ6Detail />} />
+            <Route path="/india-q7" element={<IndiaQ7Detail />} />
+            <Route path="/india-q8" element={<IndiaQ8Detail />} />
+            <Route path="/india-q9" element={<IndiaQ9Detail />} />
+            <Route path="/india-q11" element={<IndiaQ11Detail />} />
             <Route path="/cities" element={<Cities />} />
             <Route path="/climate" element={<ClimateAction />} />
             <Route path="/social" element={<SocialImpact />} />
