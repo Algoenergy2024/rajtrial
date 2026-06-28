@@ -5,6 +5,7 @@ import { ukCitiesFull as allUKCities, getUKCityById } from '../data/ukCitiesFull
 import { chinaCitiesFull as allChinaCities, getChinaCityById, chinaCountriesFull as allChinaCountries } from '../data/chinaCitiesFull'
 import { indiaCitiesFull as allIndiaCities, getIndiaCityById, indiaCountriesFull as allIndiaCountries } from '../data/indiaCitiesFull'
 import { japanCitiesFull as allJapanCities, getJapanCityById, japanCountriesFull as allJapanCountries } from '../data/japanCitiesFull'
+import { latamCitiesFull as allLatamCities, getLatamCityById, latamCountriesFull as allLatamCountries } from '../data/latamCitiesFull'
 
 // UKWW region countries (reported through UK CDP but not in Europe)
 const UKWW_COUNTRIES = [
@@ -26,6 +27,10 @@ const indiaCountries = [...allIndiaCountries].sort()
 // Sort Japan cities alphabetically
 const japanCities = [...allJapanCities].sort((a, b) => a.name.localeCompare(b.name))
 const japanCountries = [...allJapanCountries].sort()
+
+// Sort Latin America cities alphabetically
+const latamCities = [...allLatamCities].sort((a, b) => a.name.localeCompare(b.name))
+const latamCountries = [...allLatamCountries].sort()
 
 // Separate UKWW cities from European cities
 const ukwwCities = [...allEuropeanCities]
@@ -51,7 +56,8 @@ export const CATEGORIES = {
   UKWW_CITIES: 'ukww_cities',
   CHINA_CITIES: 'china_cities',
   INDIA_CITIES: 'india_cities',
-  JAPAN_CITIES: 'japan_cities'
+  JAPAN_CITIES: 'japan_cities',
+  LATAM_CITIES: 'latam_cities'
 }
 
 const OrganizationContext = createContext()
@@ -85,6 +91,9 @@ export function OrganizationProvider({ children }) {
       case CATEGORIES.JAPAN_CITIES:
         if (selectedCountry === 'all') return japanCities || []
         return japanCities.filter(c => c?.country === selectedCountry) || []
+      case CATEGORIES.LATAM_CITIES:
+        if (selectedCountry === 'all') return latamCities || []
+        return latamCities.filter(c => c?.country === selectedCountry) || []
       default:
         return entities || []
     }
@@ -113,6 +122,11 @@ export function OrganizationProvider({ children }) {
       const city = getJapanCityById(selectedId)
       if (city) return city
       return currentEntities[0] || { id: 'default', name: 'No Japan cities available' }
+    }
+    if (category === CATEGORIES.LATAM_CITIES) {
+      const city = getLatamCityById(selectedId)
+      if (city) return city
+      return currentEntities[0] || { id: 'default', name: 'No Latin America cities available' }
     }
     if (category === CATEGORIES.EUROPEAN_CITIES || category === CATEGORIES.UKWW_CITIES) {
       const city = getCityById(selectedId)
@@ -148,6 +162,8 @@ export function OrganizationProvider({ children }) {
       setSelectedId(indiaCities[0]?.id || '3422')
     } else if (newCategory === CATEGORIES.JAPAN_CITIES) {
       setSelectedId(japanCities[0]?.id || '3422')
+    } else if (newCategory === CATEGORIES.LATAM_CITIES) {
+      setSelectedId(latamCities[0]?.id || '3422')
     }
   }
 
@@ -166,20 +182,23 @@ export function OrganizationProvider({ children }) {
     allChinaCities: chinaCities,
     allIndiaCities: indiaCities,
     allJapanCities: japanCities,
+    allLatamCities: latamCities,
     europeanCountries,
     ukwwCountries,
     chinaCountries,
     indiaCountries,
     japanCountries,
+    latamCountries,
     selectedCountry,
     setSelectedCountry,
-    isCity: category === CATEGORIES.EUROPEAN_CITIES || category === CATEGORIES.UK_CITIES || category === CATEGORIES.UKWW_CITIES || category === CATEGORIES.CHINA_CITIES || category === CATEGORIES.INDIA_CITIES || category === CATEGORIES.JAPAN_CITIES,
+    isCity: category === CATEGORIES.EUROPEAN_CITIES || category === CATEGORIES.UK_CITIES || category === CATEGORIES.UKWW_CITIES || category === CATEGORIES.CHINA_CITIES || category === CATEGORIES.INDIA_CITIES || category === CATEGORIES.JAPAN_CITIES || category === CATEGORIES.LATAM_CITIES,
     isUKCity: category === CATEGORIES.UK_CITIES,
     isEuropeanCity: category === CATEGORIES.EUROPEAN_CITIES,
     isUKWWCity: category === CATEGORIES.UKWW_CITIES,
     isChinaCity: category === CATEGORIES.CHINA_CITIES,
     isIndiaCity: category === CATEGORIES.INDIA_CITIES,
     isJapanCity: category === CATEGORIES.JAPAN_CITIES,
+    isLatamCity: category === CATEGORIES.LATAM_CITIES,
     isBank: category === CATEGORIES.BELGIAN_BANKS,
     isInsurance: category === CATEGORIES.BELGIAN_INSURANCE
   }

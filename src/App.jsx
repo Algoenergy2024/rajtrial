@@ -39,6 +39,7 @@ const CATEGORY_TABS = [
   { key: CATEGORIES.CHINA_CITIES, label: 'China', shortLabel: 'China', icon: Globe, color: 'red' },
   { key: CATEGORIES.INDIA_CITIES, label: 'India', shortLabel: 'India', icon: Globe, color: 'orange' },
   { key: CATEGORIES.JAPAN_CITIES, label: 'Japan', shortLabel: 'Japan', icon: Globe, color: 'pink' },
+  { key: CATEGORIES.LATAM_CITIES, label: 'Latin America', shortLabel: 'LATAM', icon: Globe, color: 'emerald' },
 ]
 import Dashboard from './pages/Dashboard'
 import ClimateAction from './pages/ClimateAction'
@@ -138,6 +139,20 @@ import JapanQ7Detail from './pages/JapanQ7Detail'
 import JapanQ8Detail from './pages/JapanQ8Detail'
 import JapanQ9Detail from './pages/JapanQ9Detail'
 import JapanQ11Detail from './pages/JapanQ11Detail'
+import LatamCitiesDashboard from './pages/LatamCitiesDashboard'
+import LatamCityDashboard from './pages/LatamCityDashboard'
+import LatamCityComparison from './pages/LatamCityComparison'
+import LatamAIAutomation from './pages/LatamAIAutomation'
+import LatamQ1Detail from './pages/LatamQ1Detail'
+import LatamQ2Detail from './pages/LatamQ2Detail'
+import LatamQ3Detail from './pages/LatamQ3Detail'
+import LatamQ4Detail from './pages/LatamQ4Detail'
+import LatamQ5Detail from './pages/LatamQ5Detail'
+import LatamQ6Detail from './pages/LatamQ6Detail'
+import LatamQ7Detail from './pages/LatamQ7Detail'
+import LatamQ8Detail from './pages/LatamQ8Detail'
+import LatamQ9Detail from './pages/LatamQ9Detail'
+import LatamQ11Detail from './pages/LatamQ11Detail'
 
 // Navigation for Belgian Banks
 const banksNavigation = [
@@ -303,6 +318,29 @@ const japanCDPQuestions = [
   { name: 'Q11 Additional', href: '/japan-q11', icon: FileText },
 ]
 
+// Navigation for Latin America cities
+const latamNavigation = [
+  { name: 'Overview', href: '/latam-cities', icon: LayoutDashboard },
+  { name: 'Entity Dashboard', href: '/latam-dashboard', icon: MapPin },
+  { name: 'CDP Questions', href: null, icon: FileText, isDropdown: true, dropdownType: 'latam' },
+  { name: 'City Comparison', href: '/latam-comparison', icon: TrendingUp },
+  { name: 'AI & Automation', href: '/latam-ai', icon: Brain },
+]
+
+// CDP Question pages for Latin America Cities dropdown
+const latamCDPQuestions = [
+  { name: 'Q1 Profile', href: '/latam-q1', icon: FileText },
+  { name: 'Q2 Hazards', href: '/latam-q2', icon: CloudRain },
+  { name: 'Q3 Emissions', href: '/latam-q3', icon: Factory },
+  { name: 'Q4 Energy', href: '/latam-q4', icon: Zap },
+  { name: 'Q5 Adaptation', href: '/latam-q5', icon: Shield },
+  { name: 'Q6 Targets', href: '/latam-q6', icon: Target },
+  { name: 'Q7 Other', href: '/latam-q7', icon: Target },
+  { name: 'Q8 Plans', href: '/latam-q8', icon: ClipboardList },
+  { name: 'Q9 Actions', href: '/latam-q9', icon: Zap },
+  { name: 'Q11 Additional', href: '/latam-q11', icon: FileText },
+]
+
 // CDP Regions for cities sidebar
 const cdpRegions = [
   { name: 'Europe', code: 'Europe', count: 148 },
@@ -377,7 +415,7 @@ function AppContent() {
   const [cdpDropdownOpen, setCdpDropdownOpen] = useState(false)
   const location = useLocation()
   const navigate = useNavigate()
-  const { category, setCategory, isCity, isUKCity, isEuropeanCity, isUKWWCity, isChinaCity, isIndiaCity, isJapanCity } = useOrganization()
+  const { category, setCategory, isCity, isUKCity, isEuropeanCity, isUKWWCity, isChinaCity, isIndiaCity, isJapanCity, isLatamCity } = useOrganization()
 
   // Check if current page is a CDP question page
   const isOnUKCDPPage = ukCDPQuestions.some(q => q.href === location.pathname)
@@ -386,7 +424,8 @@ function AppContent() {
   const isOnChinaCDPPage = chinaCDPQuestions.some(q => q.href === location.pathname)
   const isOnIndiaCDPPage = indiaCDPQuestions.some(q => q.href === location.pathname)
   const isOnJapanCDPPage = japanCDPQuestions.some(q => q.href === location.pathname)
-  const isOnCDPPage = isOnUKCDPPage || isOnEUCDPPage || isOnUKWWCDPPage || isOnChinaCDPPage || isOnIndiaCDPPage || isOnJapanCDPPage
+  const isOnLatamCDPPage = latamCDPQuestions.some(q => q.href === location.pathname)
+  const isOnCDPPage = isOnUKCDPPage || isOnEUCDPPage || isOnUKWWCDPPage || isOnChinaCDPPage || isOnIndiaCDPPage || isOnJapanCDPPage || isOnLatamCDPPage
 
   const navigation = isUKCity
     ? ukCitiesNavigation
@@ -400,9 +439,11 @@ function AppContent() {
             ? indiaNavigation
             : isJapanCity
               ? japanNavigation
-              : category === CATEGORIES.BELGIAN_INSURANCE
-                ? insuranceNavigation
-                : banksNavigation
+              : isLatamCity
+                ? latamNavigation
+                : category === CATEGORIES.BELGIAN_INSURANCE
+                  ? insuranceNavigation
+                  : banksNavigation
 
   // Handle category change with automatic navigation to category dashboard
   const handleCategoryChange = (newCategory) => {
@@ -426,6 +467,9 @@ function AppContent() {
         break
       case CATEGORIES.JAPAN_CITIES:
         navigate('/japan-cities')
+        break
+      case CATEGORIES.LATAM_CITIES:
+        navigate('/latam-cities')
         break
       case CATEGORIES.BELGIAN_INSURANCE:
         navigate('/insurance')
@@ -480,7 +524,8 @@ function AppContent() {
               isUKWWCity ? 'bg-amber-50 text-amber-700' :
               isChinaCity ? 'bg-red-50 text-red-700' :
               isIndiaCity ? 'bg-orange-50 text-orange-700' :
-              isJapanCity ? 'bg-pink-50 text-pink-700' : 'bg-blue-50 text-blue-700'
+              isJapanCity ? 'bg-pink-50 text-pink-700' :
+              isLatamCity ? 'bg-emerald-50 text-emerald-700' : 'bg-blue-50 text-blue-700'
             }`}>
               {category === CATEGORIES.BELGIAN_BANKS && '🏦 Belgian Banks'}
               {category === CATEGORIES.BELGIAN_INSURANCE && '🛡️ Belgian Insurance'}
@@ -490,6 +535,7 @@ function AppContent() {
               {category === CATEGORIES.CHINA_CITIES && '🇨🇳 China Cities'}
               {category === CATEGORIES.INDIA_CITIES && '🇮🇳 India Cities'}
               {category === CATEGORIES.JAPAN_CITIES && '🇯🇵 Japan Cities'}
+              {category === CATEGORIES.LATAM_CITIES && '🌎 Latin America Cities'}
             </div>
           </div>
         )}
@@ -502,7 +548,7 @@ function AppContent() {
               const isActive = item.href ? location.pathname === item.href : isOnCDPPage
 
               // Handle dropdown items (CDP Questions for UK, EU, UKWW, China, India, or Japan)
-              if (item.isDropdown && (isUKCity || isEuropeanCity || isUKWWCity || isChinaCity || isIndiaCity || isJapanCity)) {
+              if (item.isDropdown && (isUKCity || isEuropeanCity || isUKWWCity || isChinaCity || isIndiaCity || isJapanCity || isLatamCity)) {
                 const questions = item.dropdownType === 'eu'
                   ? euCDPQuestions
                   : item.dropdownType === 'ukww'
@@ -513,7 +559,9 @@ function AppContent() {
                         ? indiaCDPQuestions
                         : item.dropdownType === 'japan'
                           ? japanCDPQuestions
-                          : ukCDPQuestions
+                          : item.dropdownType === 'latam'
+                            ? latamCDPQuestions
+                            : ukCDPQuestions
                 const activeColor = isEuropeanCity
                   ? 'bg-green-100 text-green-700'
                   : isUKWWCity
@@ -524,7 +572,9 @@ function AppContent() {
                         ? 'bg-orange-100 text-orange-700'
                         : isJapanCity
                           ? 'bg-pink-100 text-pink-700'
-                          : 'bg-indigo-100 text-indigo-700'
+                          : isLatamCity
+                            ? 'bg-emerald-100 text-emerald-700'
+                            : 'bg-indigo-100 text-indigo-700'
                 return (
                   <li key={item.name}>
                     <button
@@ -715,6 +765,7 @@ function AppContent() {
                   red: isActive ? 'bg-red-100 text-red-700 border-red-200' : 'hover:bg-red-50 text-gray-600',
                   orange: isActive ? 'bg-orange-100 text-orange-700 border-orange-200' : 'hover:bg-orange-50 text-gray-600',
                   pink: isActive ? 'bg-pink-100 text-pink-700 border-pink-200' : 'hover:bg-pink-50 text-gray-600',
+                  emerald: isActive ? 'bg-emerald-100 text-emerald-700 border-emerald-200' : 'hover:bg-emerald-50 text-gray-600',
                 }
                 return (
                   <button
@@ -829,6 +880,20 @@ function AppContent() {
             <Route path="/japan-q8" element={<JapanQ8Detail />} />
             <Route path="/japan-q9" element={<JapanQ9Detail />} />
             <Route path="/japan-q11" element={<JapanQ11Detail />} />
+            <Route path="/latam-cities" element={<LatamCitiesDashboard />} />
+            <Route path="/latam-dashboard" element={<LatamCityDashboard />} />
+            <Route path="/latam-comparison" element={<LatamCityComparison />} />
+            <Route path="/latam-ai" element={<LatamAIAutomation />} />
+            <Route path="/latam-q1" element={<LatamQ1Detail />} />
+            <Route path="/latam-q2" element={<LatamQ2Detail />} />
+            <Route path="/latam-q3" element={<LatamQ3Detail />} />
+            <Route path="/latam-q4" element={<LatamQ4Detail />} />
+            <Route path="/latam-q5" element={<LatamQ5Detail />} />
+            <Route path="/latam-q6" element={<LatamQ6Detail />} />
+            <Route path="/latam-q7" element={<LatamQ7Detail />} />
+            <Route path="/latam-q8" element={<LatamQ8Detail />} />
+            <Route path="/latam-q9" element={<LatamQ9Detail />} />
+            <Route path="/latam-q11" element={<LatamQ11Detail />} />
             <Route path="/cities" element={<Cities />} />
             <Route path="/climate" element={<ClimateAction />} />
             <Route path="/social" element={<SocialImpact />} />
