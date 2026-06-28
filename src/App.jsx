@@ -38,6 +38,7 @@ const CATEGORY_TABS = [
   { key: CATEGORIES.UKWW_CITIES, label: 'UKWW', shortLabel: 'UKWW', icon: Globe, color: 'amber' },
   { key: CATEGORIES.CHINA_CITIES, label: 'China', shortLabel: 'China', icon: Globe, color: 'red' },
   { key: CATEGORIES.INDIA_CITIES, label: 'India', shortLabel: 'India', icon: Globe, color: 'orange' },
+  { key: CATEGORIES.JAPAN_CITIES, label: 'Japan', shortLabel: 'Japan', icon: Globe, color: 'pink' },
 ]
 import Dashboard from './pages/Dashboard'
 import ClimateAction from './pages/ClimateAction'
@@ -123,6 +124,20 @@ import IndiaQ7Detail from './pages/IndiaQ7Detail'
 import IndiaQ8Detail from './pages/IndiaQ8Detail'
 import IndiaQ9Detail from './pages/IndiaQ9Detail'
 import IndiaQ11Detail from './pages/IndiaQ11Detail'
+import JapanCitiesDashboard from './pages/JapanCitiesDashboard'
+import JapanCityDashboard from './pages/JapanCityDashboard'
+import JapanCityComparison from './pages/JapanCityComparison'
+import JapanAIAutomation from './pages/JapanAIAutomation'
+import JapanQ1Detail from './pages/JapanQ1Detail'
+import JapanQ2Detail from './pages/JapanQ2Detail'
+import JapanQ3Detail from './pages/JapanQ3Detail'
+import JapanQ4Detail from './pages/JapanQ4Detail'
+import JapanQ5Detail from './pages/JapanQ5Detail'
+import JapanQ6Detail from './pages/JapanQ6Detail'
+import JapanQ7Detail from './pages/JapanQ7Detail'
+import JapanQ8Detail from './pages/JapanQ8Detail'
+import JapanQ9Detail from './pages/JapanQ9Detail'
+import JapanQ11Detail from './pages/JapanQ11Detail'
 
 // Navigation for Belgian Banks
 const banksNavigation = [
@@ -265,6 +280,29 @@ const indiaCDPQuestions = [
   { name: 'Q11 Additional', href: '/india-q11', icon: FileText },
 ]
 
+// Navigation for Japan cities
+const japanNavigation = [
+  { name: 'Overview', href: '/japan-cities', icon: LayoutDashboard },
+  { name: 'Entity Dashboard', href: '/japan-dashboard', icon: MapPin },
+  { name: 'CDP Questions', href: null, icon: FileText, isDropdown: true, dropdownType: 'japan' },
+  { name: 'City Comparison', href: '/japan-comparison', icon: TrendingUp },
+  { name: 'AI & Automation', href: '/japan-ai', icon: Brain },
+]
+
+// CDP Question pages for Japan Cities dropdown
+const japanCDPQuestions = [
+  { name: 'Q1 Profile', href: '/japan-q1', icon: FileText },
+  { name: 'Q2 Hazards', href: '/japan-q2', icon: CloudRain },
+  { name: 'Q3 Emissions', href: '/japan-q3', icon: Factory },
+  { name: 'Q4 Energy', href: '/japan-q4', icon: Zap },
+  { name: 'Q5 Adaptation', href: '/japan-q5', icon: Shield },
+  { name: 'Q6 Targets', href: '/japan-q6', icon: Target },
+  { name: 'Q7 Other', href: '/japan-q7', icon: Target },
+  { name: 'Q8 Plans', href: '/japan-q8', icon: ClipboardList },
+  { name: 'Q9 Actions', href: '/japan-q9', icon: Zap },
+  { name: 'Q11 Additional', href: '/japan-q11', icon: FileText },
+]
+
 // CDP Regions for cities sidebar
 const cdpRegions = [
   { name: 'Europe', code: 'Europe', count: 148 },
@@ -339,7 +377,7 @@ function AppContent() {
   const [cdpDropdownOpen, setCdpDropdownOpen] = useState(false)
   const location = useLocation()
   const navigate = useNavigate()
-  const { category, setCategory, isCity, isUKCity, isEuropeanCity, isUKWWCity, isChinaCity, isIndiaCity } = useOrganization()
+  const { category, setCategory, isCity, isUKCity, isEuropeanCity, isUKWWCity, isChinaCity, isIndiaCity, isJapanCity } = useOrganization()
 
   // Check if current page is a CDP question page
   const isOnUKCDPPage = ukCDPQuestions.some(q => q.href === location.pathname)
@@ -347,7 +385,8 @@ function AppContent() {
   const isOnUKWWCDPPage = ukwwCDPQuestions.some(q => q.href === location.pathname)
   const isOnChinaCDPPage = chinaCDPQuestions.some(q => q.href === location.pathname)
   const isOnIndiaCDPPage = indiaCDPQuestions.some(q => q.href === location.pathname)
-  const isOnCDPPage = isOnUKCDPPage || isOnEUCDPPage || isOnUKWWCDPPage || isOnChinaCDPPage || isOnIndiaCDPPage
+  const isOnJapanCDPPage = japanCDPQuestions.some(q => q.href === location.pathname)
+  const isOnCDPPage = isOnUKCDPPage || isOnEUCDPPage || isOnUKWWCDPPage || isOnChinaCDPPage || isOnIndiaCDPPage || isOnJapanCDPPage
 
   const navigation = isUKCity
     ? ukCitiesNavigation
@@ -359,9 +398,11 @@ function AppContent() {
           ? chinaNavigation
           : isIndiaCity
             ? indiaNavigation
-            : category === CATEGORIES.BELGIAN_INSURANCE
-              ? insuranceNavigation
-              : banksNavigation
+            : isJapanCity
+              ? japanNavigation
+              : category === CATEGORIES.BELGIAN_INSURANCE
+                ? insuranceNavigation
+                : banksNavigation
 
   // Handle category change with automatic navigation to category dashboard
   const handleCategoryChange = (newCategory) => {
@@ -382,6 +423,9 @@ function AppContent() {
         break
       case CATEGORIES.INDIA_CITIES:
         navigate('/india-cities')
+        break
+      case CATEGORIES.JAPAN_CITIES:
+        navigate('/japan-cities')
         break
       case CATEGORIES.BELGIAN_INSURANCE:
         navigate('/insurance')
@@ -435,7 +479,8 @@ function AppContent() {
               isEuropeanCity ? 'bg-green-50 text-green-700' :
               isUKWWCity ? 'bg-amber-50 text-amber-700' :
               isChinaCity ? 'bg-red-50 text-red-700' :
-              isIndiaCity ? 'bg-orange-50 text-orange-700' : 'bg-blue-50 text-blue-700'
+              isIndiaCity ? 'bg-orange-50 text-orange-700' :
+              isJapanCity ? 'bg-pink-50 text-pink-700' : 'bg-blue-50 text-blue-700'
             }`}>
               {category === CATEGORIES.BELGIAN_BANKS && '🏦 Belgian Banks'}
               {category === CATEGORIES.BELGIAN_INSURANCE && '🛡️ Belgian Insurance'}
@@ -444,6 +489,7 @@ function AppContent() {
               {category === CATEGORIES.UKWW_CITIES && '🌍 UKWW Cities'}
               {category === CATEGORIES.CHINA_CITIES && '🇨🇳 China Cities'}
               {category === CATEGORIES.INDIA_CITIES && '🇮🇳 India Cities'}
+              {category === CATEGORIES.JAPAN_CITIES && '🇯🇵 Japan Cities'}
             </div>
           </div>
         )}
@@ -455,8 +501,8 @@ function AppContent() {
               const Icon = item.icon
               const isActive = item.href ? location.pathname === item.href : isOnCDPPage
 
-              // Handle dropdown items (CDP Questions for UK, EU, UKWW, China, or India)
-              if (item.isDropdown && (isUKCity || isEuropeanCity || isUKWWCity || isChinaCity || isIndiaCity)) {
+              // Handle dropdown items (CDP Questions for UK, EU, UKWW, China, India, or Japan)
+              if (item.isDropdown && (isUKCity || isEuropeanCity || isUKWWCity || isChinaCity || isIndiaCity || isJapanCity)) {
                 const questions = item.dropdownType === 'eu'
                   ? euCDPQuestions
                   : item.dropdownType === 'ukww'
@@ -465,7 +511,9 @@ function AppContent() {
                       ? chinaCDPQuestions
                       : item.dropdownType === 'india'
                         ? indiaCDPQuestions
-                        : ukCDPQuestions
+                        : item.dropdownType === 'japan'
+                          ? japanCDPQuestions
+                          : ukCDPQuestions
                 const activeColor = isEuropeanCity
                   ? 'bg-green-100 text-green-700'
                   : isUKWWCity
@@ -474,7 +522,9 @@ function AppContent() {
                       ? 'bg-red-100 text-red-700'
                       : isIndiaCity
                         ? 'bg-orange-100 text-orange-700'
-                        : 'bg-indigo-100 text-indigo-700'
+                        : isJapanCity
+                          ? 'bg-pink-100 text-pink-700'
+                          : 'bg-indigo-100 text-indigo-700'
                 return (
                   <li key={item.name}>
                     <button
@@ -664,6 +714,7 @@ function AppContent() {
                   amber: isActive ? 'bg-amber-100 text-amber-700 border-amber-200' : 'hover:bg-amber-50 text-gray-600',
                   red: isActive ? 'bg-red-100 text-red-700 border-red-200' : 'hover:bg-red-50 text-gray-600',
                   orange: isActive ? 'bg-orange-100 text-orange-700 border-orange-200' : 'hover:bg-orange-50 text-gray-600',
+                  pink: isActive ? 'bg-pink-100 text-pink-700 border-pink-200' : 'hover:bg-pink-50 text-gray-600',
                 }
                 return (
                   <button
@@ -764,6 +815,20 @@ function AppContent() {
             <Route path="/india-q8" element={<IndiaQ8Detail />} />
             <Route path="/india-q9" element={<IndiaQ9Detail />} />
             <Route path="/india-q11" element={<IndiaQ11Detail />} />
+            <Route path="/japan-cities" element={<JapanCitiesDashboard />} />
+            <Route path="/japan-dashboard" element={<JapanCityDashboard />} />
+            <Route path="/japan-comparison" element={<JapanCityComparison />} />
+            <Route path="/japan-ai" element={<JapanAIAutomation />} />
+            <Route path="/japan-q1" element={<JapanQ1Detail />} />
+            <Route path="/japan-q2" element={<JapanQ2Detail />} />
+            <Route path="/japan-q3" element={<JapanQ3Detail />} />
+            <Route path="/japan-q4" element={<JapanQ4Detail />} />
+            <Route path="/japan-q5" element={<JapanQ5Detail />} />
+            <Route path="/japan-q6" element={<JapanQ6Detail />} />
+            <Route path="/japan-q7" element={<JapanQ7Detail />} />
+            <Route path="/japan-q8" element={<JapanQ8Detail />} />
+            <Route path="/japan-q9" element={<JapanQ9Detail />} />
+            <Route path="/japan-q11" element={<JapanQ11Detail />} />
             <Route path="/cities" element={<Cities />} />
             <Route path="/climate" element={<ClimateAction />} />
             <Route path="/social" element={<SocialImpact />} />

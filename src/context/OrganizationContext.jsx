@@ -4,6 +4,7 @@ import { euCitiesFull as allEuropeanCities, getEUCityById as getCityById, euCoun
 import { ukCitiesFull as allUKCities, getUKCityById } from '../data/ukCitiesFull'
 import { chinaCitiesFull as allChinaCities, getChinaCityById, chinaCountriesFull as allChinaCountries } from '../data/chinaCitiesFull'
 import { indiaCitiesFull as allIndiaCities, getIndiaCityById, indiaCountriesFull as allIndiaCountries } from '../data/indiaCitiesFull'
+import { japanCitiesFull as allJapanCities, getJapanCityById, japanCountriesFull as allJapanCountries } from '../data/japanCitiesFull'
 
 // UKWW region countries (reported through UK CDP but not in Europe)
 const UKWW_COUNTRIES = [
@@ -21,6 +22,10 @@ const chinaCountries = [...allChinaCountries].sort()
 // Sort India cities alphabetically
 const indiaCities = [...allIndiaCities].sort((a, b) => a.name.localeCompare(b.name))
 const indiaCountries = [...allIndiaCountries].sort()
+
+// Sort Japan cities alphabetically
+const japanCities = [...allJapanCities].sort((a, b) => a.name.localeCompare(b.name))
+const japanCountries = [...allJapanCountries].sort()
 
 // Separate UKWW cities from European cities
 const ukwwCities = [...allEuropeanCities]
@@ -45,7 +50,8 @@ export const CATEGORIES = {
   UK_CITIES: 'uk_cities',
   UKWW_CITIES: 'ukww_cities',
   CHINA_CITIES: 'china_cities',
-  INDIA_CITIES: 'india_cities'
+  INDIA_CITIES: 'india_cities',
+  JAPAN_CITIES: 'japan_cities'
 }
 
 const OrganizationContext = createContext()
@@ -76,6 +82,9 @@ export function OrganizationProvider({ children }) {
       case CATEGORIES.INDIA_CITIES:
         if (selectedCountry === 'all') return indiaCities || []
         return indiaCities.filter(c => c?.country === selectedCountry) || []
+      case CATEGORIES.JAPAN_CITIES:
+        if (selectedCountry === 'all') return japanCities || []
+        return japanCities.filter(c => c?.country === selectedCountry) || []
       default:
         return entities || []
     }
@@ -99,6 +108,11 @@ export function OrganizationProvider({ children }) {
       const city = getIndiaCityById(selectedId)
       if (city) return city
       return currentEntities[0] || { id: 'default', name: 'No India cities available' }
+    }
+    if (category === CATEGORIES.JAPAN_CITIES) {
+      const city = getJapanCityById(selectedId)
+      if (city) return city
+      return currentEntities[0] || { id: 'default', name: 'No Japan cities available' }
     }
     if (category === CATEGORIES.EUROPEAN_CITIES || category === CATEGORIES.UKWW_CITIES) {
       const city = getCityById(selectedId)
@@ -132,6 +146,8 @@ export function OrganizationProvider({ children }) {
       setSelectedId(chinaCities[0]?.id || '3422')
     } else if (newCategory === CATEGORIES.INDIA_CITIES) {
       setSelectedId(indiaCities[0]?.id || '3422')
+    } else if (newCategory === CATEGORIES.JAPAN_CITIES) {
+      setSelectedId(japanCities[0]?.id || '3422')
     }
   }
 
@@ -149,18 +165,21 @@ export function OrganizationProvider({ children }) {
     allUKWWCities: ukwwCities,
     allChinaCities: chinaCities,
     allIndiaCities: indiaCities,
+    allJapanCities: japanCities,
     europeanCountries,
     ukwwCountries,
     chinaCountries,
     indiaCountries,
+    japanCountries,
     selectedCountry,
     setSelectedCountry,
-    isCity: category === CATEGORIES.EUROPEAN_CITIES || category === CATEGORIES.UK_CITIES || category === CATEGORIES.UKWW_CITIES || category === CATEGORIES.CHINA_CITIES || category === CATEGORIES.INDIA_CITIES,
+    isCity: category === CATEGORIES.EUROPEAN_CITIES || category === CATEGORIES.UK_CITIES || category === CATEGORIES.UKWW_CITIES || category === CATEGORIES.CHINA_CITIES || category === CATEGORIES.INDIA_CITIES || category === CATEGORIES.JAPAN_CITIES,
     isUKCity: category === CATEGORIES.UK_CITIES,
     isEuropeanCity: category === CATEGORIES.EUROPEAN_CITIES,
     isUKWWCity: category === CATEGORIES.UKWW_CITIES,
     isChinaCity: category === CATEGORIES.CHINA_CITIES,
     isIndiaCity: category === CATEGORIES.INDIA_CITIES,
+    isJapanCity: category === CATEGORIES.JAPAN_CITIES,
     isBank: category === CATEGORIES.BELGIAN_BANKS,
     isInsurance: category === CATEGORIES.BELGIAN_INSURANCE
   }
