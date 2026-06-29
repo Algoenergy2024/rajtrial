@@ -40,6 +40,7 @@ const CATEGORY_TABS = [
   { key: CATEGORIES.INDIA_CITIES, label: 'India', shortLabel: 'India', icon: Globe, color: 'orange' },
   { key: CATEGORIES.JAPAN_CITIES, label: 'Japan', shortLabel: 'Japan', icon: Globe, color: 'pink' },
   { key: CATEGORIES.LATAM_CITIES, label: 'Latin America', shortLabel: 'LATAM', icon: Globe, color: 'emerald' },
+  { key: CATEGORIES.NORTH_AMERICA_CITIES, label: 'North America', shortLabel: 'NA', icon: Globe, color: 'sky' },
 ]
 import Dashboard from './pages/Dashboard'
 import ClimateAction from './pages/ClimateAction'
@@ -153,6 +154,20 @@ import LatamQ7Detail from './pages/LatamQ7Detail'
 import LatamQ8Detail from './pages/LatamQ8Detail'
 import LatamQ9Detail from './pages/LatamQ9Detail'
 import LatamQ11Detail from './pages/LatamQ11Detail'
+import NorthAmericaCitiesDashboard from './pages/NorthAmericaCitiesDashboard'
+import NorthAmericaCityDashboard from './pages/NorthAmericaCityDashboard'
+import NorthAmericaCityComparison from './pages/NorthAmericaCityComparison'
+import NorthAmericaAIAutomation from './pages/NorthAmericaAIAutomation'
+import NorthAmericaQ1Detail from './pages/NorthAmericaQ1Detail'
+import NorthAmericaQ2Detail from './pages/NorthAmericaQ2Detail'
+import NorthAmericaQ3Detail from './pages/NorthAmericaQ3Detail'
+import NorthAmericaQ4Detail from './pages/NorthAmericaQ4Detail'
+import NorthAmericaQ5Detail from './pages/NorthAmericaQ5Detail'
+import NorthAmericaQ6Detail from './pages/NorthAmericaQ6Detail'
+import NorthAmericaQ7Detail from './pages/NorthAmericaQ7Detail'
+import NorthAmericaQ8Detail from './pages/NorthAmericaQ8Detail'
+import NorthAmericaQ9Detail from './pages/NorthAmericaQ9Detail'
+import NorthAmericaQ11Detail from './pages/NorthAmericaQ11Detail'
 
 // Navigation for Belgian Banks
 const banksNavigation = [
@@ -341,6 +356,29 @@ const latamCDPQuestions = [
   { name: 'Q11 Additional', href: '/latam-q11', icon: FileText },
 ]
 
+// Navigation for North America cities
+const northAmericaNavigation = [
+  { name: 'Overview', href: '/na-cities', icon: LayoutDashboard },
+  { name: 'Entity Dashboard', href: '/na-dashboard', icon: MapPin },
+  { name: 'CDP Questions', href: null, icon: FileText, isDropdown: true, dropdownType: 'northamerica' },
+  { name: 'City Comparison', href: '/na-comparison', icon: TrendingUp },
+  { name: 'AI & Automation', href: '/na-ai', icon: Brain },
+]
+
+// CDP Question pages for North America Cities dropdown
+const northAmericaCDPQuestions = [
+  { name: 'Q1 Profile', href: '/na-q1', icon: FileText },
+  { name: 'Q2 Hazards', href: '/na-q2', icon: CloudRain },
+  { name: 'Q3 Emissions', href: '/na-q3', icon: Factory },
+  { name: 'Q4 Energy', href: '/na-q4', icon: Zap },
+  { name: 'Q5 Adaptation', href: '/na-q5', icon: Shield },
+  { name: 'Q6 Targets', href: '/na-q6', icon: Target },
+  { name: 'Q7 Other', href: '/na-q7', icon: Target },
+  { name: 'Q8 Plans', href: '/na-q8', icon: ClipboardList },
+  { name: 'Q9 Actions', href: '/na-q9', icon: Zap },
+  { name: 'Q11 Additional', href: '/na-q11', icon: FileText },
+]
+
 // CDP Regions for cities sidebar
 const cdpRegions = [
   { name: 'Europe', code: 'Europe', count: 148 },
@@ -415,7 +453,7 @@ function AppContent() {
   const [cdpDropdownOpen, setCdpDropdownOpen] = useState(false)
   const location = useLocation()
   const navigate = useNavigate()
-  const { category, setCategory, isCity, isUKCity, isEuropeanCity, isUKWWCity, isChinaCity, isIndiaCity, isJapanCity, isLatamCity } = useOrganization()
+  const { category, setCategory, isCity, isUKCity, isEuropeanCity, isUKWWCity, isChinaCity, isIndiaCity, isJapanCity, isLatamCity, isNorthAmericaCity } = useOrganization()
 
   // Check if current page is a CDP question page
   const isOnUKCDPPage = ukCDPQuestions.some(q => q.href === location.pathname)
@@ -425,7 +463,8 @@ function AppContent() {
   const isOnIndiaCDPPage = indiaCDPQuestions.some(q => q.href === location.pathname)
   const isOnJapanCDPPage = japanCDPQuestions.some(q => q.href === location.pathname)
   const isOnLatamCDPPage = latamCDPQuestions.some(q => q.href === location.pathname)
-  const isOnCDPPage = isOnUKCDPPage || isOnEUCDPPage || isOnUKWWCDPPage || isOnChinaCDPPage || isOnIndiaCDPPage || isOnJapanCDPPage || isOnLatamCDPPage
+  const isOnNorthAmericaCDPPage = northAmericaCDPQuestions.some(q => q.href === location.pathname)
+  const isOnCDPPage = isOnUKCDPPage || isOnEUCDPPage || isOnUKWWCDPPage || isOnChinaCDPPage || isOnIndiaCDPPage || isOnJapanCDPPage || isOnLatamCDPPage || isOnNorthAmericaCDPPage
 
   const navigation = isUKCity
     ? ukCitiesNavigation
@@ -441,9 +480,11 @@ function AppContent() {
               ? japanNavigation
               : isLatamCity
                 ? latamNavigation
-                : category === CATEGORIES.BELGIAN_INSURANCE
-                  ? insuranceNavigation
-                  : banksNavigation
+                : isNorthAmericaCity
+                  ? northAmericaNavigation
+                  : category === CATEGORIES.BELGIAN_INSURANCE
+                    ? insuranceNavigation
+                    : banksNavigation
 
   // Handle category change with automatic navigation to category dashboard
   const handleCategoryChange = (newCategory) => {
@@ -470,6 +511,9 @@ function AppContent() {
         break
       case CATEGORIES.LATAM_CITIES:
         navigate('/latam-cities')
+        break
+      case CATEGORIES.NORTH_AMERICA_CITIES:
+        navigate('/na-cities')
         break
       case CATEGORIES.BELGIAN_INSURANCE:
         navigate('/insurance')
@@ -525,7 +569,8 @@ function AppContent() {
               isChinaCity ? 'bg-red-50 text-red-700' :
               isIndiaCity ? 'bg-orange-50 text-orange-700' :
               isJapanCity ? 'bg-pink-50 text-pink-700' :
-              isLatamCity ? 'bg-emerald-50 text-emerald-700' : 'bg-blue-50 text-blue-700'
+              isLatamCity ? 'bg-emerald-50 text-emerald-700' :
+              isNorthAmericaCity ? 'bg-sky-50 text-sky-700' : 'bg-blue-50 text-blue-700'
             }`}>
               {category === CATEGORIES.BELGIAN_BANKS && '🏦 Belgian Banks'}
               {category === CATEGORIES.BELGIAN_INSURANCE && '🛡️ Belgian Insurance'}
@@ -536,6 +581,7 @@ function AppContent() {
               {category === CATEGORIES.INDIA_CITIES && '🇮🇳 India Cities'}
               {category === CATEGORIES.JAPAN_CITIES && '🇯🇵 Japan Cities'}
               {category === CATEGORIES.LATAM_CITIES && '🌎 Latin America Cities'}
+              {category === CATEGORIES.NORTH_AMERICA_CITIES && '🇺🇸 North America Cities'}
             </div>
           </div>
         )}
@@ -547,8 +593,8 @@ function AppContent() {
               const Icon = item.icon
               const isActive = item.href ? location.pathname === item.href : isOnCDPPage
 
-              // Handle dropdown items (CDP Questions for UK, EU, UKWW, China, India, or Japan)
-              if (item.isDropdown && (isUKCity || isEuropeanCity || isUKWWCity || isChinaCity || isIndiaCity || isJapanCity || isLatamCity)) {
+              // Handle dropdown items (CDP Questions for UK, EU, UKWW, China, India, Japan, Latam, or North America)
+              if (item.isDropdown && (isUKCity || isEuropeanCity || isUKWWCity || isChinaCity || isIndiaCity || isJapanCity || isLatamCity || isNorthAmericaCity)) {
                 const questions = item.dropdownType === 'eu'
                   ? euCDPQuestions
                   : item.dropdownType === 'ukww'
@@ -561,7 +607,9 @@ function AppContent() {
                           ? japanCDPQuestions
                           : item.dropdownType === 'latam'
                             ? latamCDPQuestions
-                            : ukCDPQuestions
+                            : item.dropdownType === 'northamerica'
+                              ? northAmericaCDPQuestions
+                              : ukCDPQuestions
                 const activeColor = isEuropeanCity
                   ? 'bg-green-100 text-green-700'
                   : isUKWWCity
@@ -574,7 +622,9 @@ function AppContent() {
                           ? 'bg-pink-100 text-pink-700'
                           : isLatamCity
                             ? 'bg-emerald-100 text-emerald-700'
-                            : 'bg-indigo-100 text-indigo-700'
+                            : isNorthAmericaCity
+                              ? 'bg-sky-100 text-sky-700'
+                              : 'bg-indigo-100 text-indigo-700'
                 return (
                   <li key={item.name}>
                     <button
@@ -894,6 +944,22 @@ function AppContent() {
             <Route path="/latam-q8" element={<LatamQ8Detail />} />
             <Route path="/latam-q9" element={<LatamQ9Detail />} />
             <Route path="/latam-q11" element={<LatamQ11Detail />} />
+
+            {/* North America Cities Routes */}
+            <Route path="/na-cities" element={<NorthAmericaCitiesDashboard />} />
+            <Route path="/na-dashboard" element={<NorthAmericaCityDashboard />} />
+            <Route path="/na-comparison" element={<NorthAmericaCityComparison />} />
+            <Route path="/na-ai" element={<NorthAmericaAIAutomation />} />
+            <Route path="/na-q1" element={<NorthAmericaQ1Detail />} />
+            <Route path="/na-q2" element={<NorthAmericaQ2Detail />} />
+            <Route path="/na-q3" element={<NorthAmericaQ3Detail />} />
+            <Route path="/na-q4" element={<NorthAmericaQ4Detail />} />
+            <Route path="/na-q5" element={<NorthAmericaQ5Detail />} />
+            <Route path="/na-q6" element={<NorthAmericaQ6Detail />} />
+            <Route path="/na-q7" element={<NorthAmericaQ7Detail />} />
+            <Route path="/na-q8" element={<NorthAmericaQ8Detail />} />
+            <Route path="/na-q9" element={<NorthAmericaQ9Detail />} />
+            <Route path="/na-q11" element={<NorthAmericaQ11Detail />} />
             <Route path="/cities" element={<Cities />} />
             <Route path="/climate" element={<ClimateAction />} />
             <Route path="/social" element={<SocialImpact />} />
